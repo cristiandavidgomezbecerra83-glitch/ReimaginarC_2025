@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tablero de Cobro de Suspensiones</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body { font-family: "Segoe UI", Arial, sans-serif; margin:0; padding:0; background:#f5f5f5;}
+  header { background:#8B4513; color:white; text-align:center; padding:15px;}
+  .acumulado { background:#2f2f2f; color:#d4ffb2; display:inline-block; margin:10px auto; padding:10px 25px; border-radius:10px; font-size:1.2em;}
+  .contenedor { display:flex; justify-content:space-around; flex-wrap:wrap; padding:20px;}
+  .panel { background:white; border:2px solid #ccc; border-radius:10px; width:45%; min-width:380px; padding:15px; box-shadow:0 0 8px rgba(0,0,0,0.1);}
+  h3 { background:#e67e22; color:white; text-align:center; padding:8px; border-radius:5px;}
+  table { border-collapse:collapse; width:100%; margin-top:10px;}
+  th, td { border:1px solid #ccc; padding:6px; text-align:left;}
+  th { background:#f2f2f2;}
+  label, select { margin:5px 0;}
+  canvas { margin-top:15px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h2>Información de Cobro de Suspensiones</h2>
+  <p>Idea de Reimaginar_CE</p>
+  <div class="acumulado" id="acumuladoTotal">$ 0 mill.<br><small>ACUMULADO ACTUAL</small></div>
+</header>
+
+<div class="contenedor">
+  <div class="panel" id="panelValle">
+    <h3>INFORMACIÓN VALLE</h3>
+    <label>Filtrar Sector: </label>
+    <select id="sectorValle"></select>
+    <table id="tablaValle"></table>
+    <canvas id="graficoValle" height="200"></canvas>
+  </div>
+
+  <div class="panel" id="panelTolima">
+    <h3>INFORMACIÓN TOLIMA</h3>
+    <label>Filtrar Zona: </label>
+    <select id="sectorTolima"></select>
+    <table id="tablaTolima"></table>
+    <canvas id="graficoTolima" height="200"></canvas>
+  </div>
+</div>
+
+<script>
+let datos = [];
+let chartValle, chartTolima;
+
+// URL RAW del CSV en GitHub
+const URL_CSV = "https://raw.githubusercontent.com/usuario/repositorio/main/datos.csv";
+
+// Cargar CSV desde GitHub Pages
+fetch(URL_CSV)
+  .then(response => {
+    if (!response.ok) throw new Error("No se pudo cargar el CSV desde GitHub");
+    return response.text();
+  })
+  .then(text => procesar(text))
+  .catch(err => console.error("Error al cargar CSV:", err));
+
+function procesar(text) {
+  const lineas = text.trim().split(/\r?\n/);
+  datos = lineas.slice(1).map(l => {
+    const cols = l.split(/[\t,;]+/);
+    return {
+      REGION: cols[0].trim(),
+      SECTOR: cols[1].trim(),
+      MES: cols[2].trim(),
+      CANT: parseFloat(cols[3]) || 0,
+      VALOR: parseFloat(cols[4]) || 0
+    };
+  });
+
+  actualizarTotales();
+  inicializarFiltros();
+  actualizarPanel("VALLE");
+  actualizarPanel("TOLIMA");
+}
+
+function actualizarTotales() {
+  const total = datos.reduce((a,b)=>a+b.VALOR,0);
+  document.getElementById('acumuladoTotal').innerHTML = `$ ${(total/1_000_000).toFixed(3)} mill.<br><small>ACUMULADO ACTUAL</small>`;
+}
+
+function inicializarFiltros() {
+  const sectoresValle = [...new Set(datos.filter(d => d.REGION==="VALLE").map(d => d.SECTOR))];
+  const sectoresTolima = [...new Set(datos.filter(d => d.REGION==="TOLIMA").map(d => d.SECTOR))];
+
+  llenarSelect("sectorValle", sectoresValle);
+  llenarSelect("sectorTolima", sectoresTolima);
+
+  document.getElementById('sectorValle').addEventListener('change', ()=>actualizarPanel("VALLE"));
+  document.getElementById('sectorTolima').addEventListener('change', ()=>actualizarPanel("TOLIMA"));
+}
+
+function llenarSelect(id, opciones) {
+  const sel = document.getElementById(id);
+  sel.innerHTML = `<option value="todos">Todos</option>`;
+  opciones.forEach(op => {
+    const opt = document.createElement('option');
+    opt.value = op; opt.textContent = op; sel.appendChild(opt);
+  });
+}
+
+function actualizarPanel(region) {
+  const filtro = document.getElementById(region==="VALLE"?"sectorValle":"sectorTolima").value;
+  let filtrados = datos.filter(d=>d.REGION===region);
+  if(filtro!=="todos") filtrados = filtrados.filter(d=>d.SECTOR===filtro);
+
+  const agrupado = {};
+  filtrados.forEach(d=>{
+    if(!agrupado[d.MES]) agrupado[d.MES]={cant:0,valor:0};
+    agrupado[d.MES].cant += d.CANT;
+    agrupado[d.MES].valor += d.VALOR;
+  });
+
+  const meses = Object.keys(agrupado);
+  const valores = meses.map(m=>agrupado[m].valor);
+  const cantidades = meses.map(m=>agrupado[m].cant);
+  const total = valores.reduce((a,b)=>a+b,0);
+
+  const tabla = document.getElementById(region==="VALLE"?"tablaValle":"tablaTolima");
+  tabla.innerHTML = `<tr><th>Mes</th><th>Cant</th><th>VALOR_SUSPENSION</th></tr>`+
+    meses.map((m,i)=>`<tr><td>${m}</td><td>${cantidades[i]}</td><td>$ ${valores[i].toLocaleString()}</td></tr>`).join('')+
+    `<tr><th>Total</th><th>${cantidades.reduce((a,b)=>a+b,0)}</th><th>$ ${total.toLocaleString()}</th></tr>`;
+
+  const canvas = document.getElementById(region==="VALLE"?"graficoValle":"graficoTolima");
+  const chartObj = region==="VALLE"?chartValle:chartTolima;
+  if(chartObj) chartObj.destroy();
+
+  const ctx = canvas.getContext('2d');
+  const nuevoChart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:meses,
+      datasets:[{label:'VALOR_SUSPENSION',data:valores,backgroundColor:'#3498db'}]
+    },
+    options:{
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>`$ ${ctx.raw.toLocaleString()}`}}
+      },
+      scales:{
+        y:{beginAtZero:true,ticks:{callback:val=>'$'+(val/1_000_000).toFixed(0)+' mill'}}
+      }
+    }
+  });
+
+  if(region==="VALLE") chartValle=nuevoChart;
+  else chartTolima=nuevoChart;
+}
+</script>
+
+</body>
+</html>
