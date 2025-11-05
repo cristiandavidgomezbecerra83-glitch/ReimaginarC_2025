@@ -31,25 +31,22 @@
   .topcards{display:flex;gap:18px;margin-bottom:var(--gap);flex-wrap:wrap}
   .topcard{flex:1;min-width:220px;background:linear-gradient(180deg,#fff,#fbfffd);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
 
-  /* Fila principal: línea (angosta) + tabla (angosta) + barras (pequeña) */
-  .row-main{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:start}
-  .chart-line-wrap{max-width:620px}
-  .chart-line-wrap canvas{width:100% !important; height:240px !important}
-
+  /* Fila principal: tabla (angosta) + barras (pequeña) */
+  .row-main{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:start}
   .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);max-width:520px}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
   th{color:#6b7280;font-weight:600}
 
-  .chart-bar-wrap{max-width:360px}
-  .chart-bar-wrap canvas{width:100% !important; height:220px !important}
+  .chart-bar-wrap{max-width:420px; width:420px}
+  .chart-bar-wrap canvas{width:100% !important; height:280px !important}
 
   footer{padding:18px;color:var(--muted);font-size:13px;text-align:center}
   .region-banner{font-weight:700;color:#0f172a}
 
-  @media (max-width:1400px){
+  @media (max-width:1200px){
     .row-main{grid-template-columns:1fr}
-    .chart-line-wrap,.table-wrap,.chart-bar-wrap{max-width:100%}
+    .table-wrap,.chart-bar-wrap{max-width:100%; width:100%}
   }
 </style>
 </head>
@@ -121,10 +118,9 @@
         </div>
       </div>
 
-      <!-- Vista de una región específica -->
+      <!-- Vista de una región específica (solo barras + tabla) -->
       <section id="panelGlobal">
         <div class="row-main">
-          <div class="card chart-line-wrap"><canvas id="chartLinea"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
               <h3 style="margin:0">Tabla resumen</h3><small style="color:#6b7280"><span id="rowsCount">0</span> filas</small>
@@ -136,7 +132,11 @@
               </table>
             </div>
           </div>
-          <div class="card chart-bar-wrap"><canvas id="chartBarras"></canvas></div>
+
+          <div class="card chart-bar-wrap">
+            <h3 style="margin:6px 6px 10px 6px;color:#0f172a;font-size:15px">Ahorro por sector</h3>
+            <canvas id="chartBarras"></canvas>
+          </div>
         </div>
       </section>
 
@@ -145,7 +145,6 @@
         <!-- VALLE -->
         <div class="card" style="margin-bottom:12px"><span class="region-banner">VALLE</span></div>
         <div class="row-main" style="margin-bottom:18px">
-          <div class="card chart-line-wrap"><canvas id="chartLineaV"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
               <h3 style="margin:0">Tabla VALLE</h3><small style="color:#6b7280"><span id="rowsCountV">0</span> filas</small>
@@ -154,22 +153,27 @@
               <table id="tablaResumenV"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
             </div>
           </div>
-          <div class="card chart-bar-wrap"><canvas id="chartBarrasV"></canvas></div>
+          <div class="card chart-bar-wrap">
+            <h3 style="margin:6px 6px 10px 6px;color:#0f172a;font-size:15px">Ahorro por sector — VALLE</h3>
+            <canvas id="chartBarrasV"></canvas>
+          </div>
         </div>
 
         <!-- TOLIMA -->
         <div class="card" style="margin-bottom:12px"><span class="region-banner">TOLIMA</span></div>
         <div class="row-main" style="margin-bottom:18px">
-          <div class="card chart-line-wrap"><canvas id="chartLineaT"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-              <h3 style="margin:0">Tabla TOLIMA</h3><small style="color:#6b7280"><span id="rowsCountT">0</span> filas</small>
+              <h3 style="margin:0)">Tabla TOLIMA</h3><small style="color:#6b7280"><span id="rowsCountT">0</span> filas</small>
             </div>
             <div style="overflow:auto;max-height:300px">
               <table id="tablaResumenT"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
             </div>
           </div>
-          <div class="card chart-bar-wrap"><canvas id="chartBarrasT"></canvas></div>
+          <div class="card chart-bar-wrap">
+            <h3 style="margin:6px 6px 10px 6px;color:#0f172a;font-size:15px">Ahorro por sector — TOLIMA</h3>
+            <canvas id="chartBarrasT"></canvas>
+          </div>
         </div>
       </section>
 
@@ -278,18 +282,13 @@ function render(){
     renderKPIsStatic();
     renderKPIsDinamic(list);
     renderTabla('#tablaResumen tbody', '#rowsCount', list, false, region);
-    renderCharts({ lineaId:'chartLinea', barrasId:'chartBarras', list, region });
+    renderBars('chartBarras', list, region);
   }
 }
 
 function renderRegionPanels(sufijo, list, regionName){
   renderTabla(`#tablaResumen${sufijo} tbody`, `#rowsCount${sufijo}`, list, true, regionName);
-  renderCharts({
-    lineaId:`chartLinea${sufijo}`,
-    barrasId:`chartBarras${sufijo}`,
-    list,
-    region: regionName
-  });
+  renderBars(`chartBarras${sufijo}`, list, regionName);
 }
 
 /* ====== KPIs ====== */
@@ -388,67 +387,91 @@ function renderTabla(tbodySel, countSel, list, omitRegion, regionName){
   if(countEl) countEl.textContent = filas.length;
 }
 
-/* ====== CHARTS (línea + barras naranja) ====== */
-function renderCharts({lineaId,barrasId,list,region}){
-  [lineaId,barrasId].forEach(id=>{ if(charts[id]){ charts[id].destroy(); delete charts[id]; }});
+/* ====== BARRAS (estética mejorada) ====== */
+function renderBars(canvasId, list, region){
+  // destruir si existe
+  if(charts[canvasId]){ charts[canvasId].destroy(); delete charts[canvasId]; }
 
   const mesSel = document.getElementById('filterMes').value;
   const sectorSel = document.getElementById('filterSector').value;
 
-  // --- Línea por mes (si sector específico, la serie es del sector; si no, total de la región)
-  const mesesRef = (region && region!=='ALL')
-      ? uniq(datos.filter(d=>d.REGION===region),'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()))
-      : uniq(list,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+  let labels = [], values = [], title = '';
 
-  const byMonth = {}; mesesRef.forEach(m=>byMonth[m]=0);
   if(sectorSel==='ALL'){
-    list.forEach(r=>{ byMonth[r.MES] = (byMonth[r.MES]||0) + (r.AHORRO||0); });
-  }else{
-    mesesRef.forEach(m=>{
-      const r = list.find(x=>x.SECTOR===sectorSel && x.MES===m);
-      byMonth[m] = r ? (r.AHORRO||0) : 0;
-    });
-  }
-
-  charts[lineaId] = new Chart(document.getElementById(lineaId),{
-    type:'line',
-    data:{ labels:mesesRef.map(cap), datasets:[{ label:'Ahorro (COP)', data:mesesRef.map(m=>byMonth[m]), fill:true, tension:.3, borderWidth:2, borderColor:getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#00a0d2', backgroundColor:'rgba(0,160,210,.08)' }]},
-    options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtMoney(c.raw) } } }, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
-  });
-
-  // --- Barras
-  if(sectorSel==='ALL'){
-    // Barras por SECTOR
+    // Barras por SECTOR (con mes=ALL → total; con mes elegido → valor del mes)
     const sectoresRef = region? sectoresPorRegion(region) : uniq(list,'SECTOR');
     const bySector={}; sectoresRef.forEach(s=>bySector[s]=0);
     if(mesSel==='ALL'){
       list.forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.AHORRO||0); });
+      title = 'Total Ahorro por sector';
     }else{
       list.filter(r=>r.MES===mesSel).forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.AHORRO||0); });
       sectoresRef.forEach(s=>{ if(!(s in bySector)) bySector[s]=0; });
+      title = 'Ahorro por sector — Mes ' + cap(mesSel);
     }
-    const labels = Object.keys(bySector);
-    const values = labels.map(l=>bySector[l]);
-
-    charts[barrasId] = new Chart(document.getElementById(barrasId),{
-      type:'bar',
-      data:{ labels, datasets:[{ label:(mesSel==='ALL'?'Total ':'Mes '+cap(mesSel)+' ')+'Ahorro (COP)', data:values, backgroundColor:'rgba(242,140,0,0.9)' }]},
-      options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
-    });
-
+    labels = Object.keys(bySector);
+    values = labels.map(l=>bySector[l]);
   }else{
-    // Barras por MES del sector seleccionado
-    const values = mesesRef.map(m=>{
-      const r = list.find(x=>x.SECTOR===sectorSel && x.MES===m);
-      return r ? (r.AHORRO||0) : 0;
+    // Barras por MES del sector seleccionado (mostrar todos los meses de la región, ceros donde no hay)
+    const mesesRef = region
+      ? uniq(datos.filter(d=>d.REGION===region),'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()))
+      : uniq(list,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+    labels = mesesRef.map(cap);
+    values = mesesRef.map(m=>{
+      const row = list.find(x=>x.SECTOR===sectorSel && x.MES===m);
+      return row ? (row.AHORRO||0) : 0;
     });
-
-    charts[barrasId] = new Chart(document.getElementById(barrasId),{
-      type:'bar',
-      data:{ labels:mesesRef.map(cap), datasets:[{ label:'Ahorro (COP) — '+sectorSel, data:values, backgroundColor:'rgba(242,140,0,0.9)' }]},
-      options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
-    });
+    title = 'Ahorro por mes — ' + sectorSel;
   }
+
+  const ctx = document.getElementById(canvasId);
+  charts[canvasId] = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:title,
+        data:values,
+        backgroundColor:'rgba(242,140,0,0.90)',
+        borderColor:'rgba(242,140,0,1)',
+        borderWidth:1,
+        borderRadius:6,
+        barPercentage:0.75,
+        categoryPercentage:0.66,
+        maxBarThickness:42
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{ duration:700, easing:'easeOutQuart' },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          usePointStyle:true,
+          callbacks:{ label:(ctx)=> fmtMoney(ctx.raw) }
+        },
+        title:{
+          display:false
+        }
+      },
+      scales:{
+        x:{
+          grid:{ display:false },
+          ticks:{ color:'#475569', font:{ size:12 } }
+        },
+        y:{
+          beginAtZero:true,
+          grid:{ color:'rgba(148,163,184,0.2)' },
+          ticks:{
+            color:'#475569',
+            font:{ size:12 },
+            callback:(v)=> fmtMoney(v)
+          }
+        }
+      }
+    }
+  });
 }
 
 /* ====== Utilidades ====== */
