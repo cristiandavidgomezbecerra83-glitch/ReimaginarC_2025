@@ -30,7 +30,7 @@
   main{min-height:80vh}
   .topcards{display:flex;gap:18px;margin-bottom:var(--gap);flex-wrap:wrap}
   .topcard{flex:1;min-width:220px;background:linear-gradient(180deg,#fff,#fbfffd);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
-  .charts{display:grid;grid-template-columns:1fr 420px;gap:18px}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
@@ -74,7 +74,7 @@
           </div>
           <div>
             <label for="filterSector">Sector / Zona</label>
-            <select id="filterSector"><option value="ALL">Todos</option></select>
+            <select id="filterSector" disabled><option value="ALL">Todos</option></select>
           </div>
           <div>
             <label for="filterMes">Mes</label>
@@ -84,13 +84,6 @@
             <button id="btnReset">Limpiar filtros</button>
           </div>
         </div>
-      </div>
-
-      <div style="height:var(--gap)"></div>
-
-      <div class="card">
-        <h3 style="margin:0 0 8px 0">Top 5 Sectores (por ahorro)</h3>
-        <ol id="topSectores" style="padding-left:18px;margin:0;color:var(--muted)"></ol>
       </div>
     </aside>
 
@@ -117,40 +110,31 @@
             <div id="kpiPromMes">0</div>
           </div>
         </div>
-
-        <div class="topcard">
-          <div>
-            <small style="color:var(--muted)">Top Sector</small>
-            <div class="num" id="kpiTopSector">-</div>
-          </div>
-          <div style="text-align:right">
-            <small style="color:var(--muted)">% del total</small>
-            <div id="kpiTopPct">0%</div>
-          </div>
-        </div>
       </div>
 
-      <!-- Vista global (una región específica) -->
+      <!-- Vista de una región específica -->
       <section id="panelGlobal">
         <div class="charts">
-          <div>
-            <div class="card" style="margin-bottom:18px"><canvas id="chartLinea" height="120"></canvas></div>
-            <div class="card table-wrap">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-                <h3 style="margin:0">Tabla resumen</h3><small style="color:var(--muted)"><span id="rowsCount">0</span> filas</small>
-              </div>
-              <div style="overflow:auto;max-height:360px">
-                <table id="tablaResumen">
-                  <thead><tr><th>Región</th><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead>
-                  <tbody></tbody>
-                </table>
-              </div>
+          <div class="card" style="margin-bottom:18px">
+            <canvas id="chartLinea" height="120"></canvas>
+          </div>
+          <div class="card table-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <h3 style="margin:0">Tabla resumen</h3><small style="color:var(--muted)"><span id="rowsCount">0</span> filas</small>
+            </div>
+            <div style="overflow:auto;max-height:360px">
+              <table id="tablaResumen">
+                <thead><tr><th>Región</th><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead>
+                <tbody></tbody>
+              </table>
             </div>
           </div>
-          <div>
-            <div class="card" style="margin-bottom:18px"><canvas id="chartBarras" height="220"></canvas></div>
-            <div class="card" style="margin-top:18px"><h3 style="margin:0 0 8px 0">Distribución por Región</h3><canvas id="chartTorta" height="180"></canvas></div>
+        </div>
+        <div class="charts">
+          <div class="card" style="margin-bottom:18px">
+            <canvas id="chartBarras" height="220"></canvas>
           </div>
+          <!-- (Se quitó la gráfica de participación) -->
         </div>
       </section>
 
@@ -159,40 +143,37 @@
         <!-- VALLE -->
         <div class="card" style="margin-bottom:12px"><span class="region-banner">VALLE</span></div>
         <div class="charts" style="margin-bottom:24px">
-          <div>
-            <div class="card" style="margin-bottom:18px"><canvas id="chartLineaV" height="120"></canvas></div>
-            <div class="card table-wrap">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-                <h3 style="margin:0">Tabla VALLE</h3><small style="color:var(--muted)"><span id="rowsCountV">0</span> filas</small>
-              </div>
-              <div style="overflow:auto;max-height:300px">
-                <table id="tablaResumenV"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
-              </div>
+          <div class="card" style="margin-bottom:18px"><canvas id="chartLineaV" height="120"></canvas></div>
+          <div class="card table-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <h3 style="margin:0">Tabla VALLE</h3><small style="color:var(--muted)"><span id="rowsCountV">0</span> filas</small>
             </div>
-          </div>
-          <div>
-            <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasV" height="220"></canvas></div>
-            <div class="card" style="margin-top:18px"><h3 style="margin:0 0 8px 0">Participación</h3><canvas id="chartTortaV" height="180"></canvas></div>
+            <div style="overflow:auto;max-height:300px">
+              <table id="tablaResumenV"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
+            </div>
           </div>
         </div>
+        <div class="charts" style="margin-bottom:24px">
+          <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasV" height="220"></canvas></div>
+          <!-- (Se quitó la gráfica de participación) -->
+        </div>
+
         <!-- TOLIMA -->
         <div class="card" style="margin-bottom:12px"><span class="region-banner">TOLIMA</span></div>
-        <div class="charts">
-          <div>
-            <div class="card" style="margin-bottom:18px"><canvas id="chartLineaT" height="120"></canvas></div>
-            <div class="card table-wrap">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-                <h3 style="margin:0">Tabla TOLIMA</h3><small style="color:var(--muted)"><span id="rowsCountT">0</span> filas</small>
-              </div>
-              <div style="overflow:auto;max-height:300px">
-                <table id="tablaResumenT"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
-              </div>
+        <div class="charts" style="margin-bottom:24px">
+          <div class="card" style="margin-bottom:18px"><canvas id="chartLineaT" height="120"></canvas></div>
+          <div class="card table-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <h3 style="margin:0">Tabla TOLIMA</h3><small style="color:var(--muted)"><span id="rowsCountT">0</span> filas</small>
+            </div>
+            <div style="overflow:auto;max-height:300px">
+              <table id="tablaResumenT"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
             </div>
           </div>
-          <div>
-            <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasT" height="220"></canvas></div>
-            <div class="card" style="margin-top:18px"><h3 style="margin:0 0 8px 0">Participación</h3><canvas id="chartTortaT" height="180"></canvas></div>
-          </div>
+        </div>
+        <div class="charts">
+          <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasT" height="220"></canvas></div>
+          <!-- (Se quitó la gráfica de participación) -->
         </div>
       </section>
 
@@ -221,54 +202,85 @@ const fmtMoney = n => '$ '+Number(n||0).toLocaleString('es-CO');
 const uniq = (arr,key) => [...new Set(arr.map(x=>x[key]).filter(Boolean))];
 const cap = s => (s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
 
-function poblarFiltros(){
+function poblarFiltrosIniciales(){
+  // Región
   const regSel = document.getElementById('filterRegion');
-  const sectorSel = document.getElementById('filterSector');
-  const mesSel = document.getElementById('filterMes');
-
   uniq(datos,'REGION').forEach(r=>{ const o=document.createElement('option'); o.value=r; o.textContent=r; regSel.appendChild(o); });
 
-  const sectores = uniq(datos,'SECTOR');
-  sectorSel.innerHTML = '<option value="ALL">Todos</option>' + sectores.map(s=>`<option value="${s}">${s}</option>`).join('');
+  // Meses (global ALL por defecto)
+  actualizarMeses('ALL');
 
-  const meses = uniq(datos,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
-  mesSel.innerHTML = '<option value="ALL">Todos</option>' + meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
+  // Sector: deshabilitado cuando ALL
+  actualizarSectores('ALL');
 }
 
-function filtrarBase(){
-  const s = document.getElementById('filterSector').value;
-  const m = document.getElementById('filterMes').value;
+function actualizarSectores(region){
+  const sectorSel = document.getElementById('filterSector');
+  const disabled = (region === 'ALL');
+  sectorSel.disabled = disabled;
+
+  let opciones = [];
+  if(region === 'VALLE'){
+    opciones = ['CENTRO','NORTE','PACIFICO','SUR'];
+  }else if(region === 'TOLIMA'){
+    // Exactamente como están en el dataset:
+    opciones = ['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
+  }
+
+  if(disabled){
+    sectorSel.innerHTML = '<option value="ALL">Todos</option>';
+    sectorSel.value = 'ALL';
+  }else{
+    sectorSel.innerHTML = '<option value="ALL">Todos</option>' + opciones.map(s=>`<option value="${s}">${s}</option>`).join('');
+    sectorSel.value = 'ALL';
+  }
+}
+
+function actualizarMeses(region){
+  const mesSel = document.getElementById('filterMes');
+  let fuente = datos;
+  if(region !== 'ALL'){
+    fuente = datos.filter(d=>d.REGION===region);
+  }
+  const meses = uniq(fuente,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+  mesSel.innerHTML = '<option value="ALL">Todos</option>' + meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
+  mesSel.value = 'ALL';
+}
+
+function filtrarBase(region){
+  const sector = document.getElementById('filterSector').value;
+  const mes = document.getElementById('filterMes').value;
+
   return datos.filter(d=>{
-    if(s!=='ALL' && d.SECTOR!==s) return false;
-    if(m!=='ALL' && d.MES!==m) return false;
+    if(region !== 'ALL' && d.REGION !== region) return false;
+    if(sector !== 'ALL' && d.SECTOR !== sector) return false;
+    if(mes !== 'ALL' && d.MES !== mes) return false;
     return true;
   });
 }
 
 function render(){
   const region = document.getElementById('filterRegion').value;
-  const base = filtrarBase();
 
   if(region==='ALL'){
     document.getElementById('panelGlobal').style.display = 'none';
     document.getElementById('panelSplit').style.display = '';
 
+    const base = filtrarBase('ALL'); // mes aplicado a ambas regiones
     const valle = base.filter(d=>d.REGION==='VALLE');
     const tolima = base.filter(d=>d.REGION==='TOLIMA');
 
     renderKPIs(base);
     renderRegionPanels('V', valle);
     renderRegionPanels('T', tolima);
-    renderTopSectores(base);
   }else{
     document.getElementById('panelGlobal').style.display = '';
     document.getElementById('panelSplit').style.display = 'none';
 
-    const list = base.filter(d=>d.REGION===region);
+    const list = filtrarBase(region);
     renderKPIs(list);
     renderTabla('#tablaResumen tbody', '#rowsCount', list, false);
-    renderCharts({ lineaId:'chartLinea', barrasId:'chartBarras', tortaId:'chartTorta', list });
-    renderTopSectores(list);
+    renderCharts({ lineaId:'chartLinea', barrasId:'chartBarras', list });
   }
 }
 
@@ -277,7 +289,6 @@ function renderRegionPanels(sufijo, list){
   renderCharts({
     lineaId:`chartLinea${sufijo}`,
     barrasId:`chartBarras${sufijo}`,
-    tortaId:`chartTorta${sufijo}`,
     list
   });
 }
@@ -294,7 +305,7 @@ function renderKPIs(list){
   document.getElementById('kpiCant').textContent = (cant||0).toLocaleString();
   document.getElementById('kpiPromMes').textContent = Math.round((cant||0)/months).toLocaleString();
 
-  // crecimiento últimos 2 meses (evitar .at)
+  // crecimiento últimos 2 meses (sin .at)
   const byM={}; list.forEach(r=>{ byM[r.MES]=(byM[r.MES]||0)+(r.AHORRO||0); });
   const orden = Object.keys(byM).sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
   let last=0, prev=0;
@@ -311,10 +322,10 @@ function renderTabla(tbodySel, countSel, list, omitRegion){
   const countEl = document.querySelector(countSel); if(countEl) countEl.textContent = list.length;
 }
 
-function renderCharts({lineaId,barrasId,tortaId,list}){
-  [lineaId,barrasId,tortaId].forEach(id=>{ if(charts[id]){ charts[id].destroy(); delete charts[id]; }});
+function renderCharts({lineaId,barrasId,list}){
+  [lineaId,barrasId].forEach(id=>{ if(charts[id]){ charts[id].destroy(); delete charts[id]; }});
 
-  // línea por mes
+  // Línea por mes
   const byMonth={}; list.forEach(r=>{ byMonth[r.MES]=(byMonth[r.MES]||0)+(r.AHORRO||0); });
   const meses = Object.keys(byMonth).sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
   const valores = meses.map(m=>byMonth[m]);
@@ -324,38 +335,35 @@ function renderCharts({lineaId,barrasId,tortaId,list}){
     options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtMoney(c.raw) } } }, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
   });
 
-  // barras top sectores
+  // Barras por sector (COLOR NARANJA)
   const byS={}; list.forEach(r=>{ byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0); });
   const secLabels = Object.keys(byS).sort((a,b)=>byS[b]-byS[a]).slice(0,8);
   const secVals = secLabels.map(s=>byS[s]);
   charts[barrasId] = new Chart(document.getElementById(barrasId),{
     type:'bar',
-    data:{ labels:secLabels, datasets:[{ label:'Ahorro (COP)', data:secVals, backgroundColor:'rgba(0,122,90,0.85)' }]},
+    data:{ labels:secLabels, datasets:[{ label:'Ahorro (COP)', data:secVals, backgroundColor:'rgba(242,140,0,0.9)' }]},
     options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
-  });
-
-  // torta por región
-  const byR={}; list.forEach(r=>{ byR[r.REGION]=(byR[r.REGION]||0)+(r.AHORRO||0); });
-  const regLabels = Object.keys(byR);
-  const regVals = regLabels.map(r=>byR[r]);
-  charts[tortaId] = new Chart(document.getElementById(tortaId),{
-    type:'pie',
-    data:{ labels:regLabels, datasets:[{ data:regVals, backgroundColor:['#007a5a','#00a0d2','#f59e0b','#6b7280'] }]},
-    options:{ plugins:{ legend:{ position:'bottom' }, tooltip:{ callbacks:{ label:c=> c.label+': '+fmtMoney(c.raw) } } } }
   });
 }
 
 function init(){
-  poblarFiltros();
-  document.getElementById('filterRegion').addEventListener('change', render);
+  poblarFiltrosIniciales();
+
+  document.getElementById('filterRegion').addEventListener('change', (e)=>{
+    const region = e.target.value;
+    actualizarSectores(region);
+    actualizarMeses(region);
+    render();
+  });
   document.getElementById('filterSector').addEventListener('change', render);
   document.getElementById('filterMes').addEventListener('change', render);
   document.getElementById('btnReset').addEventListener('click', ()=>{
     document.getElementById('filterRegion').value='ALL';
-    document.getElementById('filterSector').value='ALL';
-    document.getElementById('filterMes').value='ALL';
+    actualizarSectores('ALL');
+    actualizarMeses('ALL');
     render();
   });
+
   document.getElementById('lastUpdated').textContent = 'Última carga: '+(new Date()).toLocaleString();
   render();
 }
