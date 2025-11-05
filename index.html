@@ -64,15 +64,22 @@
 </head>
 <body>
   <header style="background:#f5f5f5; border-bottom:4px solid #F28C00; display:flex; align-items:center; padding:10px 20px; gap:15px;">
-  <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia" style="height:75px;">
-  <div>
-    <h2 style="margin:0; color:#333; font-weight:600;">Información de Cobro de Suspensiones</h2>
-    <p style="margin:0; color:#666; font-size:0.85em;">Idea de Reimaginar_CE</p>
-  </div>
-  <div class="acumulado" id="acumuladoTotal" style="margin-left:auto; background:#2f2f2f; color:#d4ffb2; display:inline-block; padding:10px 25px; border-radius:10px; font-size:1.2em; text-align:center;">
-    $ 0 mill.<br><small>ACUMULADO ACTUAL</small>
-  </div>
-</header>
+    <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia" style="height:75px;">
+    <div>
+      <h2 style="margin:0; color:#333; font-weight:600;">Información de Cobro de Suspensiones</h2>
+      <p style="margin:0; color:#666; font-size:0.85em;">Idea de Reimaginar_CE</p>
+    </div>
+
+    <div style="margin-left:auto; text-align:right;">
+      <div class="acumulado" id="acumuladoTotal" style="background:#2f2f2f; color:#d4ffb2; display:inline-block; padding:10px 25px; border-radius:10px; font-size:1.2em; text-align:center;">
+        $ 0 mill.<br><small>ACUMULADO ACTUAL</small>
+      </div>
+      <div>
+        <!-- lastUpdated añadido para evitar error JS -->
+        <small id="lastUpdated" style="display:block;color:var(--muted);font-size:12px;margin-top:6px;">Última carga: --</small>
+      </div>
+    </div>
+  </header>
 
   <div class="layout">
     <aside class="sidebar">
@@ -196,8 +203,8 @@
   </footer>
 
   <script>
-    // CSV RAW URL (tu repo)
-    const URL_CSV = "https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC_2025/main/datos.csv";
+    // CSV RAW URL CORREGIDA (tu repo actual)
+    const URL_CSV = "https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/datos.csv";
 
     let datos = [];
     let chartLinea, chartBarras, chartTorta;
@@ -226,7 +233,9 @@
       .then(r=>{ if(!r.ok) throw new Error('No se pudo cargar CSV'); return r.text(); })
       .then(t=>{
         datos = parseCSV(t);
-        document.getElementById('lastUpdated').textContent = 'Última carga: ' + new Date().toLocaleString();
+        // actualiza la etiqueta que ahora existe en el HTML
+        const now = new Date();
+        document.getElementById('lastUpdated').textContent = 'Última carga: ' + now.toLocaleString();
         inicializar();
       }).catch(e=>{
         console.error(e); alert('Error al cargar CSV. Revisa la consola.');
