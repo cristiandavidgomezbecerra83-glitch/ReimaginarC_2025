@@ -23,7 +23,6 @@
   .layout{display:grid;grid-template-columns:360px 1fr;gap:var(--gap);padding:18px}
   .sidebar{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);height:calc(100vh - 120px);overflow:auto}
   .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
-  .kpi{display:flex;gap:12px;align-items:center}
   .kpi .num{font-size:20px;font-weight:700}
   .filters{display:flex;flex-direction:column;gap:10px;margin-top:8px}
   label{font-size:13px;color:var(--muted)}
@@ -32,28 +31,25 @@
   .topcards{display:flex;gap:18px;margin-bottom:var(--gap);flex-wrap:wrap}
   .topcard{flex:1;min-width:220px;background:linear-gradient(180deg,#fff,#fbfffd);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
 
-  /* Fila principal: línea (angosta) + tabla (angosta) */
-  .row-main{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
+  /* Fila principal: línea (angosta) + tabla (angosta) + barras (pequeña) */
+  .row-main{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:start}
   .chart-line-wrap{max-width:620px}
   .chart-line-wrap canvas{width:100% !important; height:240px !important}
 
-  /* Tabla más angosta */
   .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);max-width:520px}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
-  th{color:var(--muted);font-weight:600}
+  th{color:#6b7280;font-weight:600}
 
-  /* Barras pequeñas, en su columna lateral */
-  .row-side{display:grid;grid-template-columns:auto;gap:18px;max-width:380px}
+  .chart-bar-wrap{max-width:360px}
   .chart-bar-wrap canvas{width:100% !important; height:220px !important}
 
   footer{padding:18px;color:var(--muted);font-size:13px;text-align:center}
   .region-banner{font-weight:700;color:#0f172a}
 
-  @media (max-width:1200px){
+  @media (max-width:1400px){
     .row-main{grid-template-columns:1fr}
-    .chart-line-wrap{max-width:100%}
-    .table-wrap{max-width:100%}
+    .chart-line-wrap,.table-wrap,.chart-bar-wrap{max-width:100%}
   }
 </style>
 </head>
@@ -66,21 +62,17 @@
     </div>
     <div class="right">
       <div class="pill" id="acumuladoTotal">$ 0 mill.<br><small>ACUMULADO ACTUAL</small></div>
-      <small id="lastUpdated" style="display:block;color:var(--muted);font-size:12px;margin-top:6px;">Última carga: --</small>
+      <small id="lastUpdated" style="display:block;color:#6b7280;font-size:12px;margin-top:6px;">Última carga: --</small>
     </div>
   </header>
 
   <div class="layout">
     <aside class="sidebar">
       <div class="card">
-        <div class="kpi">
+        <div class="kpi" style="display:flex;gap:12px;align-items:center;justify-content:space-between">
           <div>
             <div class="num" id="acumuladoLarge">$ 0</div>
             <small>Total Ahorro (COP)</small>
-          </div>
-          <div style="margin-left:auto;text-align:right">
-            <small style="color:var(--muted)">Ticket promedio</small>
-            <div class="num" id="ticketProm">$ 0</div>
           </div>
         </div>
         <div style="height:12px"></div>
@@ -108,22 +100,22 @@
       <div class="topcards">
         <div class="topcard">
           <div>
-            <small style="color:var(--muted)">Total Ahorro (COP)</small>
+            <small style="color:#6b7280">Total Ahorro (COP)</small>
             <div class="num" id="kpiAcum">$ 0</div>
           </div>
           <div style="text-align:right">
-            <small style="color:var(--muted)">Crec. (últ. mes)</small>
+            <small style="color:#6b7280">Crec. (últ. mes)</small>
             <div id="kpiCrec" style="color:var(--accent-1);font-weight:700">0%</div>
           </div>
         </div>
 
         <div class="topcard">
           <div>
-            <small style="color:var(--muted)">Cantidad</small>
+            <small style="color:#6b7280">Cantidad</small>
             <div class="num" id="kpiCant">0</div>
           </div>
           <div style="text-align:right">
-            <small style="color:var(--muted)">Promedio / mes</small>
+            <small style="color:#6b7280">Promedio / mes</small>
             <div id="kpiPromMes">0</div>
           </div>
         </div>
@@ -135,7 +127,7 @@
           <div class="card chart-line-wrap"><canvas id="chartLinea"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-              <h3 style="margin:0">Tabla resumen</h3><small style="color:var(--muted)"><span id="rowsCount">0</span> filas</small>
+              <h3 style="margin:0">Tabla resumen</h3><small style="color:#6b7280"><span id="rowsCount">0</span> filas</small>
             </div>
             <div style="overflow:auto;max-height:360px">
               <table id="tablaResumen">
@@ -144,8 +136,6 @@
               </table>
             </div>
           </div>
-        </div>
-        <div class="row-side" style="margin-top:18px">
           <div class="card chart-bar-wrap"><canvas id="chartBarras"></canvas></div>
         </div>
       </section>
@@ -158,14 +148,12 @@
           <div class="card chart-line-wrap"><canvas id="chartLineaV"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-              <h3 style="margin:0">Tabla VALLE</h3><small style="color:var(--muted)"><span id="rowsCountV">0</span> filas</small>
+              <h3 style="margin:0">Tabla VALLE</h3><small style="color:#6b7280"><span id="rowsCountV">0</span> filas</small>
             </div>
             <div style="overflow:auto;max-height:300px">
               <table id="tablaResumenV"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
             </div>
           </div>
-        </div>
-        <div class="row-side" style="margin-bottom:24px">
           <div class="card chart-bar-wrap"><canvas id="chartBarrasV"></canvas></div>
         </div>
 
@@ -175,14 +163,12 @@
           <div class="card chart-line-wrap"><canvas id="chartLineaT"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-              <h3 style="margin:0">Tabla TOLIMA</h3><small style="color:var(--muted)"><span id="rowsCountT">0</span> filas</small>
+              <h3 style="margin:0">Tabla TOLIMA</h3><small style="color:#6b7280"><span id="rowsCountT">0</span> filas</small>
             </div>
             <div style="overflow:auto;max-height:300px">
               <table id="tablaResumenT"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
             </div>
           </div>
-        </div>
-        <div class="row-side" style="margin-bottom:24px">
           <div class="card chart-bar-wrap"><canvas id="chartBarrasT"></canvas></div>
         </div>
       </section>
@@ -247,12 +233,9 @@ function actualizarSectores(region){
 }
 
 function actualizarMeses(region){
-  // Meses de referencia por región para que nunca falte un mes en sector específico
   const mesSel = document.getElementById('filterMes');
   let fuente = datos;
-  if(region !== 'ALL'){
-    fuente = datos.filter(d=>d.REGION===region);
-  }
+  if(region !== 'ALL'){ fuente = datos.filter(d=>d.REGION===region); }
   const meses = uniq(fuente,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
   mesSel.innerHTML = '<option value="ALL">Todos</option>' + meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
   mesSel.value = 'ALL';
@@ -312,13 +295,9 @@ function renderRegionPanels(sufijo, list, regionName){
 /* ====== KPIs ====== */
 function renderKPIsStatic(){
   const totalAll = datos.reduce((a,b)=>a+(b.AHORRO||0),0);
-  const cantAll  = datos.reduce((a,b)=>a+(b.CANT||0),0);
-  const ticketAll = cantAll? Math.round(totalAll/cantAll):0;
-
   document.getElementById('acumuladoTotal').innerHTML = fmtMoney(totalAll)+"<br><small>ACUMULADO ACTUAL</small>";
   document.getElementById('acumuladoLarge').textContent = fmtMoney(totalAll);
   document.getElementById('kpiAcum').textContent = fmtMoney(totalAll);
-  document.getElementById('ticketProm').textContent = fmtMoney(ticketAll);
 }
 
 function renderKPIsDinamic(list){
@@ -337,7 +316,7 @@ function renderKPIsDinamic(list){
   document.getElementById('kpiCrec').textContent = (crec>=0?'+':'')+crec+'%';
 }
 
-/* ====== TABLA (respeta reglas de sector/mes + ceros) ====== */
+/* ====== TABLA ====== */
 function renderTabla(tbodySel, countSel, list, omitRegion, regionName){
   const mesSel = document.getElementById('filterMes').value;
   const sectorSel = document.getElementById('filterSector').value;
@@ -409,7 +388,7 @@ function renderTabla(tbodySel, countSel, list, omitRegion, regionName){
   if(countEl) countEl.textContent = filas.length;
 }
 
-/* ====== CHARTS (barras naranja, lógica por sector) ====== */
+/* ====== CHARTS (línea + barras naranja) ====== */
 function renderCharts({lineaId,barrasId,list,region}){
   [lineaId,barrasId].forEach(id=>{ if(charts[id]){ charts[id].destroy(); delete charts[id]; }});
 
@@ -423,10 +402,8 @@ function renderCharts({lineaId,barrasId,list,region}){
 
   const byMonth = {}; mesesRef.forEach(m=>byMonth[m]=0);
   if(sectorSel==='ALL'){
-    // total de la región por mes
     list.forEach(r=>{ byMonth[r.MES] = (byMonth[r.MES]||0) + (r.AHORRO||0); });
   }else{
-    // solo el sector por mes (cero si no hay)
     mesesRef.forEach(m=>{
       const r = list.find(x=>x.SECTOR===sectorSel && x.MES===m);
       byMonth[m] = r ? (r.AHORRO||0) : 0;
@@ -448,7 +425,6 @@ function renderCharts({lineaId,barrasId,list,region}){
       list.forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.AHORRO||0); });
     }else{
       list.filter(r=>r.MES===mesSel).forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.AHORRO||0); });
-      // aseguro todos los sectores
       sectoresRef.forEach(s=>{ if(!(s in bySector)) bySector[s]=0; });
     }
     const labels = Object.keys(bySector);
