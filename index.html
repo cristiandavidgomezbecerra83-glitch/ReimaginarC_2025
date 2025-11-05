@@ -19,6 +19,7 @@
   header p{margin:0;color:#666;font-size:.85em}
   header .right{margin-left:auto;text-align:right}
   .pill{background:#2f2f2f;color:#d4ffb2;display:inline-block;padding:10px 16px;border-radius:10px;font-size:1.05em}
+
   .layout{display:grid;grid-template-columns:360px 1fr;gap:var(--gap);padding:18px}
   .sidebar{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);height:calc(100vh - 120px);overflow:auto}
   .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
@@ -30,14 +31,27 @@
   main{min-height:80vh}
   .topcards{display:flex;gap:18px;margin-bottom:var(--gap);flex-wrap:wrap}
   .topcard{flex:1;min-width:220px;background:linear-gradient(180deg,#fff,#fbfffd);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
-  .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+  /* Fila principal: línea (angosta) + tabla */
+  .row-main{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
+  .chart-line-wrap{max-width:620px}           /* <-- línea más angosta */
+  .chart-line-wrap canvas{width:100% !important; height:240px !important}
+
+  /* Fila lateral: barras pequeñas en la misma columna (derecha) */
+  .row-side{display:grid;grid-template-columns:auto;gap:18px;max-width:380px} /* <-- barras pequeñas */
+  .chart-bar-wrap canvas{width:100% !important; height:220px !important}
+
   .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
   th{color:var(--muted);font-weight:600}
   footer{padding:18px;color:var(--muted);font-size:13px;text-align:center}
   .region-banner{font-weight:700;color:#0f172a}
-  @media (max-width:980px){.layout{grid-template-columns:1fr}.charts{grid-template-columns:1fr}}
+
+  @media (max-width:1200px){
+    .row-main{grid-template-columns:1fr}
+    .chart-line-wrap{max-width:100%}
+  }
 </style>
 </head>
 <body>
@@ -114,10 +128,8 @@
 
       <!-- Vista de una región específica -->
       <section id="panelGlobal">
-        <div class="charts">
-          <div class="card" style="margin-bottom:18px">
-            <canvas id="chartLinea" height="120"></canvas>
-          </div>
+        <div class="row-main">
+          <div class="card chart-line-wrap"><canvas id="chartLinea"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
               <h3 style="margin:0">Tabla resumen</h3><small style="color:var(--muted)"><span id="rowsCount">0</span> filas</small>
@@ -130,11 +142,8 @@
             </div>
           </div>
         </div>
-        <div class="charts">
-          <div class="card" style="margin-bottom:18px">
-            <canvas id="chartBarras" height="220"></canvas>
-          </div>
-          <!-- (Se quitó la gráfica de participación) -->
+        <div class="row-side" style="margin-top:18px">
+          <div class="card chart-bar-wrap"><canvas id="chartBarras"></canvas></div>
         </div>
       </section>
 
@@ -142,8 +151,8 @@
       <section id="panelSplit" style="display:none">
         <!-- VALLE -->
         <div class="card" style="margin-bottom:12px"><span class="region-banner">VALLE</span></div>
-        <div class="charts" style="margin-bottom:24px">
-          <div class="card" style="margin-bottom:18px"><canvas id="chartLineaV" height="120"></canvas></div>
+        <div class="row-main" style="margin-bottom:18px">
+          <div class="card chart-line-wrap"><canvas id="chartLineaV"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
               <h3 style="margin:0">Tabla VALLE</h3><small style="color:var(--muted)"><span id="rowsCountV">0</span> filas</small>
@@ -153,15 +162,14 @@
             </div>
           </div>
         </div>
-        <div class="charts" style="margin-bottom:24px">
-          <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasV" height="220"></canvas></div>
-          <!-- (Se quitó la gráfica de participación) -->
+        <div class="row-side" style="margin-bottom:24px">
+          <div class="card chart-bar-wrap"><canvas id="chartBarrasV"></canvas></div>
         </div>
 
         <!-- TOLIMA -->
         <div class="card" style="margin-bottom:12px"><span class="region-banner">TOLIMA</span></div>
-        <div class="charts" style="margin-bottom:24px">
-          <div class="card" style="margin-bottom:18px"><canvas id="chartLineaT" height="120"></canvas></div>
+        <div class="row-main" style="margin-bottom:18px">
+          <div class="card chart-line-wrap"><canvas id="chartLineaT"></canvas></div>
           <div class="card table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
               <h3 style="margin:0">Tabla TOLIMA</h3><small style="color:var(--muted)"><span id="rowsCountT">0</span> filas</small>
@@ -171,9 +179,8 @@
             </div>
           </div>
         </div>
-        <div class="charts">
-          <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasT" height="220"></canvas></div>
-          <!-- (Se quitó la gráfica de participación) -->
+        <div class="row-side" style="margin-bottom:24px">
+          <div class="card chart-bar-wrap"><canvas id="chartBarrasT"></canvas></div>
         </div>
       </section>
 
@@ -202,6 +209,7 @@ const fmtMoney = n => '$ '+Number(n||0).toLocaleString('es-CO');
 const uniq = (arr,key) => [...new Set(arr.map(x=>x[key]).filter(Boolean))];
 const cap = s => (s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
 
+/* ====== FILTROS ====== */
 function poblarFiltrosIniciales(){
   // Región
   const regSel = document.getElementById('filterRegion');
@@ -223,7 +231,6 @@ function actualizarSectores(region){
   if(region === 'VALLE'){
     opciones = ['CENTRO','NORTE','PACIFICO','SUR'];
   }else if(region === 'TOLIMA'){
-    // Exactamente como están en el dataset:
     opciones = ['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
   }
 
@@ -237,6 +244,7 @@ function actualizarSectores(region){
 }
 
 function actualizarMeses(region){
+  // Mismos meses por sector: definimos meses a nivel región (o global)
   const mesSel = document.getElementById('filterMes');
   let fuente = datos;
   if(region !== 'ALL'){
@@ -247,6 +255,7 @@ function actualizarMeses(region){
   mesSel.value = 'ALL';
 }
 
+/* ====== DATA VIEW (con regla de agregación) ====== */
 function filtrarBase(region){
   const sector = document.getElementById('filterSector').value;
   const mes = document.getElementById('filterMes').value;
@@ -259,6 +268,7 @@ function filtrarBase(region){
   });
 }
 
+/* ====== RENDER ====== */
 function render(){
   const region = document.getElementById('filterRegion').value;
 
@@ -266,7 +276,7 @@ function render(){
     document.getElementById('panelGlobal').style.display = 'none';
     document.getElementById('panelSplit').style.display = '';
 
-    const base = filtrarBase('ALL'); // mes aplicado a ambas regiones
+    const base = filtrarBase('ALL'); // aplica mes a ambas
     const valle = base.filter(d=>d.REGION==='VALLE');
     const tolima = base.filter(d=>d.REGION==='TOLIMA');
 
@@ -279,20 +289,23 @@ function render(){
 
     const list = filtrarBase(region);
     renderKPIs(list);
-    renderTabla('#tablaResumen tbody', '#rowsCount', list, false);
-    renderCharts({ lineaId:'chartLinea', barrasId:'chartBarras', list });
+    renderTabla('#tablaResumen tbody', '#rowsCount', list, false, region);
+    renderCharts({ lineaId:'chartLinea', barrasId:'chartBarras', list, region });
   }
 }
 
 function renderRegionPanels(sufijo, list){
-  renderTabla(`#tablaResumen${sufijo} tbody`, `#rowsCount${sufijo}`, list, true);
+  const regionName = (sufijo==='V')?'VALLE':'TOLIMA';
+  renderTabla(`#tablaResumen${sufijo} tbody`, `#rowsCount${sufijo}`, list, true, regionName);
   renderCharts({
     lineaId:`chartLinea${sufijo}`,
     barrasId:`chartBarras${sufijo}`,
-    list
+    list,
+    region: regionName
   });
 }
 
+/* ====== KPIs ====== */
 function renderKPIs(list){
   const total = list.reduce((a,b)=>a+(b.AHORRO||0),0);
   const cant  = list.reduce((a,b)=>a+(b.CANT||0),0);
@@ -305,7 +318,7 @@ function renderKPIs(list){
   document.getElementById('kpiCant').textContent = (cant||0).toLocaleString();
   document.getElementById('kpiPromMes').textContent = Math.round((cant||0)/months).toLocaleString();
 
-  // crecimiento últimos 2 meses (sin .at)
+  // crecimiento últimos 2 meses
   const byM={}; list.forEach(r=>{ byM[r.MES]=(byM[r.MES]||0)+(r.AHORRO||0); });
   const orden = Object.keys(byM).sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
   let last=0, prev=0;
@@ -315,19 +328,55 @@ function renderKPIs(list){
   document.getElementById('kpiCrec').textContent = (crec>=0?'+':'')+crec+'%';
 }
 
-function renderTabla(tbodySel, countSel, list, omitRegion){
+/* ====== TABLA (agrega por sector si mes=ALL) ====== */
+function renderTabla(tbodySel, countSel, list, omitRegion, regionName){
+  const mesSel = document.getElementById('filterMes').value;
+  let rowsHTML = '';
+  if(mesSel === 'ALL'){
+    // Agregado por sector (todos los meses)
+    const bySec = {};
+    list.forEach(r=>{
+      const key = (omitRegion?'':r.REGION)+'|'+r.SECTOR;
+      if(!bySec[key]) bySec[key] = { REGION:r.REGION, SECTOR:r.SECTOR, CANT:0, AHORRO:0 };
+      bySec[key].CANT += (r.CANT||0);
+      bySec[key].AHORRO += (r.AHORRO||0);
+    });
+    const arr = Object.values(bySec).sort((a,b)=> b.AHORRO-a.AHORRO);
+    rowsHTML = arr.map(r=>`<tr>${omitRegion?'':`<td>${r.REGION}</td>`}<td>${r.SECTOR}</td><td>Todos</td><td>${r.CANT}</td><td>${fmtMoney(r.AHORRO)}</td></tr>`).join('');
+    document.querySelector(countSel).textContent = arr.length;
+  }else{
+    // Filtrado por mes → muestra ese mes por sector
+    const arr = [];
+    const sectoresRegion = regionName ? sectoresPorRegion(regionName) : uniq(list,'SECTOR'); // asegurar consistencia
+    sectoresRegion.forEach(sec=>{
+      const match = list.find(x=>x.SECTOR===sec && x.MES===mesSel);
+      if(match){
+        arr.push({REGION:match.REGION, SECTOR:sec, MES:mesSel, CANT:match.CANT||0, AHORRO:match.AHORRO||0});
+      }else{
+        // si quieres, puedes añadir filas cero; ahora omitimos si no existe
+      }
+    });
+    rowsHTML = arr.map(r=>`<tr>${omitRegion?'':`<td>${r.REGION}</td>`}<td>${r.SECTOR}</td><td>${cap(r.MES)}</td><td>${r.CANT}</td><td>${fmtMoney(r.AHORRO)}</td></tr>`).join('');
+    document.querySelector(countSel).textContent = arr.length;
+  }
+
   const tbody = document.querySelector(tbodySel);
-  const rows = list.map(r=>`<tr>${omitRegion?'':`<td>${r.REGION}</td>`}<td>${r.SECTOR}</td><td>${cap(r.MES)}</td><td>${r.CANT}</td><td>${fmtMoney(r.AHORRO)}</td></tr>`).join('');
-  tbody.innerHTML = rows || `<tr><td colspan="${omitRegion?4:5}" style="color:#999">Sin datos</td></tr>`;
-  const countEl = document.querySelector(countSel); if(countEl) countEl.textContent = list.length;
+  tbody.innerHTML = rowsHTML || `<tr><td colspan="${omitRegion?4:5}" style="color:#999">Sin datos</td></tr>`;
 }
 
-function renderCharts({lineaId,barrasId,list}){
+/* ====== CHARTS ====== */
+function renderCharts({lineaId,barrasId,list,region}){
   [lineaId,barrasId].forEach(id=>{ if(charts[id]){ charts[id].destroy(); delete charts[id]; }});
 
-  // Línea por mes
-  const byMonth={}; list.forEach(r=>{ byMonth[r.MES]=(byMonth[r.MES]||0)+(r.AHORRO||0); });
-  const meses = Object.keys(byMonth).sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+  // -------- Línea por mes (NO excluye meses; usa meses de la región o global)
+  let fuenteMes = datos;
+  if(region){ fuenteMes = datos.filter(d=>d.REGION===region); }
+  const mesesRef = uniq(fuenteMes,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+
+  const byMonth={}; mesesRef.forEach(m=>byMonth[m]=0);
+  list.forEach(r=>{ byMonth[r.MES] = (byMonth[r.MES]||0) + (r.AHORRO||0); });
+
+  const meses = mesesRef;
   const valores = meses.map(m=>byMonth[m]);
   charts[lineaId] = new Chart(document.getElementById(lineaId),{
     type:'line',
@@ -335,17 +384,36 @@ function renderCharts({lineaId,barrasId,list}){
     options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtMoney(c.raw) } } }, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
   });
 
-  // Barras por sector (COLOR NARANJA)
-  const byS={}; list.forEach(r=>{ byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0); });
-  const secLabels = Object.keys(byS).sort((a,b)=>byS[b]-byS[a]).slice(0,8);
+  // -------- Barras por sector (NARANJA) con regla:
+  // Mes = ALL → total por sector; Mes seleccionado → valor de ese mes por sector.
+  const mesSel = document.getElementById('filterMes').value;
+  const byS={};
+  if(mesSel === 'ALL'){
+    list.forEach(r=>{ byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0); });
+  }else{
+    list.filter(r=>r.MES===mesSel).forEach(r=>{ byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0); });
+    // Garantiza que aparezcan todos los sectores esperados en la región, con 0 si no hay fila del mes
+    const sectoresRef = region? sectoresPorRegion(region) : uniq(list,'SECTOR');
+    sectoresRef.forEach(s=>{ if(!(s in byS)) byS[s]=0; });
+  }
+  const secLabels = Object.keys(byS).sort((a,b)=>byS[b]-byS[a]);
   const secVals = secLabels.map(s=>byS[s]);
+
   charts[barrasId] = new Chart(document.getElementById(barrasId),{
     type:'bar',
-    data:{ labels:secLabels, datasets:[{ label:'Ahorro (COP)', data:secVals, backgroundColor:'rgba(242,140,0,0.9)' }]},
+    data:{ labels:secLabels, datasets:[{ label:(mesSel==='ALL'?'Total ':'Mes ' + cap(mesSel)+' ')+'Ahorro (COP)', data:secVals, backgroundColor:'rgba(242,140,0,0.9)' }]},
     options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
   });
 }
 
+/* ====== Utilidades ====== */
+function sectoresPorRegion(region){
+  return region==='VALLE'
+    ? ['CENTRO','NORTE','PACIFICO','SUR']
+    : ['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
+}
+
+/* ====== INIT ====== */
 function init(){
   poblarFiltrosIniciales();
 
