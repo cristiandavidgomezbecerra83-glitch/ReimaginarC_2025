@@ -3,118 +3,117 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Dashboard Celsia — Cobro de Suspensiones (Pro) - Datos Insertados</title>
+  <title>Dashboard Celsia — Cobro de Suspensiones (Pro) · Separación por Región</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      --bg:#f4f7f9;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --accent-1:#007a5a; /* verde */
-      --accent-2:#00a0d2; /* azul */
-      --radius:12px;
-      --gap:18px;
+      --bg:#f4f7f9; --card:#ffffff; --muted:#6b7280; --ink:#0f172a;
+      --accent-1:#007a5a; --accent-2:#00a0d2; --naranja:#F28C00;
+      --shadow:0 6px 18px rgba(16,24,40,.08); --radius:12px; --gap:18px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
     }
     html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg) 0%, #eef6f5 100%);} 
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:transparent}
+    header{display:flex;align-items:center;gap:15px;padding:10px 20px;border-bottom:4px solid var(--naranja);background:#f5f5f5}
+    header .brand{display:flex;align-items:center;gap:12px}
+    header img{height:75px}
+    header h2{margin:0;color:#333;font-weight:600}
+    header p{margin:0;color:#666;font-size:.85em}
+    header .right{margin-left:auto;text-align:right}
+    .pill{background:#2f2f2f;color:#d4ffb2;display:inline-block;padding:10px 16px;border-radius:10px;font-size:1.05em}
     .layout{display:grid;grid-template-columns:360px 1fr;gap:var(--gap);padding:18px}
-    .sidebar{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 6px 18px rgba(16,24,40,0.06);height:calc(100vh - 120px);overflow:auto}
-    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+    .sidebar{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);height:calc(100vh - 120px);overflow:auto}
+    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
     .kpi{display:flex;gap:12px;align-items:center}
     .kpi .num{font-size:20px;font-weight:700}
     .filters{display:flex;flex-direction:column;gap:10px;margin-top:8px}
     label{font-size:13px;color:var(--muted)}
-    select,input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef0}
+    select,button{padding:8px;border-radius:8px;border:1px solid #e6eef0}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
     main{min-height:80vh}
     .topcards{display:flex;gap:18px;margin-bottom:var(--gap);flex-wrap:wrap}
-    .topcard{flex:1;min-width:200px;background:linear-gradient(180deg, #ffffff, #fbfffd);padding:14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
+    .topcard{flex:1;min-width:220px;background:linear-gradient(180deg, #ffffff, #fbfffd);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
     .charts{display:grid;grid-template-columns:1fr 420px;gap:18px}
-    .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+    .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
     table{width:100%;border-collapse:collapse;font-size:13px}
     th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
-    th{color:var(--muted);font-weight:600;background:#fafafa}
+    th{color:var(--muted);font-weight:600}
     footer{padding:18px;color:var(--muted);font-size:13px;text-align:center}
-    @media (max-width:980px){
-      .layout{grid-template-columns:1fr;}
-      .charts{grid-template-columns:1fr}
-    }
+    .badge{background:#eef6f5;color:#0f172a;border-radius:999px;padding:2px 8px;font-size:12px}
+    .btn{background:#fff;border:1px solid #dbe7ea;cursor:pointer}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px 0}
+    .region-banner{font-weight:700;color:#0f172a}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}.charts{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <header style="background:#f5f5f5; border-bottom:4px solid #F28C00; display:flex; align-items:center; padding:10px 20px; gap:15px;">
-    <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia" style="height:75px;">
-    <div>
-      <h2 style="margin:0; color:#333; font-weight:600;">Información de Cobro de Suspensiones</h2>
-      <p style="margin:0; color:#666; font-size:0.85em;">Idea de ReimaginarC</p>
-    </div>
-
-    <div style="margin-left:auto; text-align:right;">
-      <div class="acumulado" id="acumuladoTotal" style="background:#2f2f2f; color:#d4ffb2; display:inline-block; padding:10px 25px; border-radius:10px; font-size:1.1em; text-align:center;">
-        $ 0 mill.<br><small>ACUMULADO ACTUAL</small>
-      </div>
+  <header>
+    <div class="brand">
+      <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia">
       <div>
-        <small id="lastUpdated" style="display:block;color:#6b7280;font-size:12px;margin-top:6px;">Última carga: --</small>
+        <h2>Información de Cobro de Suspensiones</h2>
+        <p>Idea de Reimaginar_CE — Datos insertados · Campo económico: AHORRO</p>
       </div>
+    </div>
+    <div class="right">
+      <div class="pill" id="acumuladoTotal">$ 0 mill.<br><small>ACUMULADO ACTUAL</small></div>
+      <small id="lastUpdated" style="display:block;color:var(--muted);font-size:12px;margin-top:6px;">Última carga: --</small>
     </div>
   </header>
 
   <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" aria-label="Barra lateral de filtros y KPIs">
       <div class="card">
-        <div class="kpi">
+        <div class="kpi" role="group" aria-label="Indicadores principales">
           <div>
             <div class="num" id="acumuladoLarge">$ 0</div>
-            <small>Total Acumulado (COP)</small>
+            <small>Total Ahorro (COP)</small>
           </div>
-          <div style="text-align:right">
+          <div style="margin-left:auto;text-align:right">
             <small style="color:var(--muted)">Ticket promedio</small>
             <div class="num" id="ticketProm">$ 0</div>
           </div>
         </div>
-
         <div style="height:12px"></div>
-
         <div class="filters">
           <div>
-            <label>Region</label>
+            <label for="filterRegion">Región</label>
             <select id="filterRegion"><option value="ALL">Todos</option></select>
           </div>
           <div>
-            <label>Sector / Zona</label>
+            <label for="filterSector">Sector / Zona</label>
             <select id="filterSector"><option value="ALL">Todos</option></select>
           </div>
           <div>
-            <label>Mes</label>
+            <label for="filterMes">Mes</label>
             <select id="filterMes"><option value="ALL">Todos</option></select>
           </div>
-          <div>
-            <label>Búsqueda rápida</label>
-            <input id="quickSearch" placeholder="Sector, Mes...">
+          <div class="toolbar" style="margin-top:6px">
+            <button class="btn" id="btnReset">Limpiar filtros</button>
+            <button class="btn" id="btnExport">Exportar CSV</button>
           </div>
         </div>
       </div>
 
-      <div style="height:18px"></div>
+      <div style="height:var(--gap)"></div>
 
       <div class="card">
-        <h3 style="margin:0 0 8px 0">Top 5 Sectores (by valor)</h3>
+        <h3 style="margin:0 0 8px 0">Top 5 Sectores (por ahorro)</h3>
         <ol id="topSectores" style="padding-left:18px;margin:0;color:var(--muted)"></ol>
       </div>
 
-      <div style="height:18px"></div>
+      <div style="height:var(--gap)"></div>
 
       <div class="card">
         <h3 style="margin:0 0 8px 0">Notas</h3>
-        <p style="margin:0;color:var(--muted);font-size:13px">Datos embebidos en el HTML (no requiere CSV). Actualiza el array <code>datos</code> en el script si quieres cambiar valores.</p>
+        <p style="margin:0;color:var(--muted);font-size:13px">Cuando "Región" = <b>Todos</b>, el dashboard se muestra <b>separado por VALLE y TOLIMA</b>. Si eliges una región específica, verás solo esa.</p>
       </div>
     </aside>
 
     <main>
       <div class="topcards">
-        <div class="topcard">
+        <div class="topcard" aria-live="polite">
           <div>
-            <small style="color:var(--muted)">Acumulado (COP)</small>
+            <small style="color:var(--muted)">Total Ahorro (COP)</small>
             <div class="num" id="kpiAcum">$ 0</div>
           </div>
           <div style="text-align:right">
@@ -125,7 +124,7 @@
 
         <div class="topcard">
           <div>
-            <small style="color:var(--muted)">Cant. Suspensiones</small>
+            <small style="color:var(--muted)">Cantidad</small>
             <div class="num" id="kpiCant">0</div>
           </div>
           <div style="text-align:right">
@@ -146,226 +145,270 @@
         </div>
       </div>
 
-      <div class="charts">
-        <div>
-          <div class="card" style="margin-bottom:18px">
-            <canvas id="chartLinea" height="120"></canvas>
+      <!-- Panel Global (se muestra cuando Region != ALL) -->
+      <section id="panelGlobal">
+        <div class="charts">
+          <div>
+            <div class="card" style="margin-bottom:18px">
+              <canvas id="chartLinea" height="120" aria-label="Evolución mensual del ahorro"></canvas>
+            </div>
+            <div class="card table-wrap">
+              <div class="section-title"><h3 style="margin:0">Tabla resumen</h3><small style="color:var(--muted)"><span id="rowsCount">0</span> filas</small></div>
+              <div style="overflow:auto;max-height:360px">
+                <table id="tablaResumen">
+                  <thead>
+                    <tr>
+                      <th>Región</th>
+                      <th>Sector</th>
+                      <th>Mes</th>
+                      <th>Cant</th>
+                      <th>Ahorro</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
-          <div class="card table-wrap">
-            <h3 style="margin-top:0">Tabla resumen</h3>
-            <div style="overflow:auto;max-height:320px">
-              <table id="tablaResumen">
-                <thead><tr><th>Region</th><th>Sector</th><th>Mes</th><th>Cant</th><th>Valor</th></tr></thead>
-                <tbody></tbody>
-              </table>
+          <div>
+            <div class="card" style="margin-bottom:18px">
+              <canvas id="chartBarras" height="220" aria-label="Top sectores por ahorro"></canvas>
+            </div>
+            <div class="card" style="margin-top:18px">
+              <h3 style="margin:0 0 8px 0">Distribución por Región</h3>
+              <canvas id="chartTorta" height="180" aria-label="Distribución de ahorro por región"></canvas>
             </div>
           </div>
         </div>
+      </section>
 
-        <div>
-          <div class="card" style="margin-bottom:18px">
-            <canvas id="chartBarras" height="220"></canvas>
+      <!-- Paneles por Región (se muestran cuando Region = ALL) -->
+      <section id="panelSplit" style="display:none">
+        <!-- VALLE -->
+        <div class="card" style="margin-bottom:12px"><span class="region-banner">VALLE</span></div>
+        <div class="charts" style="margin-bottom:24px">
+          <div>
+            <div class="card" style="margin-bottom:18px"><canvas id="chartLineaV" height="120"></canvas></div>
+            <div class="card table-wrap">
+              <div class="section-title"><h3 style="margin:0">Tabla VALLE</h3><small style="color:var(--muted)"><span id="rowsCountV">0</span> filas</small></div>
+              <div style="overflow:auto;max-height:300px">
+                <table id="tablaResumenV"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
+              </div>
+            </div>
           </div>
-
-          <div class="card" style="margin-top:18px">
-            <h3 style="margin:0 0 8px 0">Distribución por Region</h3>
-            <canvas id="chartTorta" height="180"></canvas>
+          <div>
+            <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasV" height="220"></canvas></div>
+            <div class="card" style="margin-top:18px"><h3 style="margin:0 0 8px 0">Participación</h3><canvas id="chartTortaV" height="180"></canvas></div>
           </div>
         </div>
-      </div>
+        <!-- TOLIMA -->
+        <div class="card" style="margin-bottom:12px"><span class="region-banner">TOLIMA</span></div>
+        <div class="charts">
+          <div>
+            <div class="card" style="margin-bottom:18px"><canvas id="chartLineaT" height="120"></canvas></div>
+            <div class="card table-wrap">
+              <div class="section-title"><h3 style="margin:0">Tabla TOLIMA</h3><small style="color:var(--muted)"><span id="rowsCountT">0</span> filas</small></div>
+              <div style="overflow:auto;max-height:300px">
+                <table id="tablaResumenT"><thead><tr><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead><tbody></tbody></table>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:18px"><canvas id="chartBarrasT" height="220"></canvas></div>
+            <div class="card" style="margin-top:18px"><h3 style="margin:0 0 8px 0">Participación</h3><canvas id="chartTortaT" height="180"></canvas></div>
+          </div>
+        </div>
+      </section>
 
     </main>
   </div>
 
   <footer>
-    Creado para Celsia · Datos insertados en el HTML
+    Creado para Celsia · Datos insertados en el HTML · Campo económico: AHORRO · Vista separada por región cuando corresponde
   </footer>
 
 <script>
-  // ========== DATOS INSERTADOS AQUÍ ==========
+  // ==================== DATOS INSERTADOS ====================
   const datos = [
-    { REGION: 'VALLE', SECTOR: 'CENTRO', MES: 'abril', CANT: 200, VALOR_SUSPENSION: 15000000 },
-    { REGION: 'VALLE', SECTOR: 'NORTE', MES: 'abril', CANT: 300, VALOR_SUSPENSION: 18000000 },
-    { REGION: 'VALLE', SECTOR: 'PACIFICO', MES: 'mayo', CANT: 400, VALOR_SUSPENSION: 25000000 },
-    { REGION: 'VALLE', SECTOR: 'SUR', MES: 'junio', CANT: 350, VALOR_SUSPENSION: 18000000 },
-    { REGION: 'TOLIMA', SECTOR: 'Zona Centro', MES: 'abril', CANT: 150, VALOR_SUSPENSION: 8000000 },
-    { REGION: 'TOLIMA', SECTOR: 'Zona Norte', MES: 'mayo', CANT: 200, VALOR_SUSPENSION: 11000000 },
-    { REGION: 'TOLIMA', SECTOR: 'Zona Sur', MES: 'junio', CANT: 250, VALOR_SUSPENSION: 13000000 },
-    { REGION: 'TOLIMA', SECTOR: 'Zona Oriente', MES: 'julio', CANT: 180, VALOR_SUSPENSION: 6000000 }
+    { REGION:'VALLE',  SECTOR:'CENTRO',       MES:'abril', CANT:200, AHORRO:15000000 },
+    { REGION:'VALLE',  SECTOR:'NORTE',        MES:'abril', CANT:300, AHORRO:18000000 },
+    { REGION:'VALLE',  SECTOR:'PACIFICO',     MES:'mayo',  CANT:400, AHORRO:25000000 },
+    { REGION:'VALLE',  SECTOR:'SUR',          MES:'junio', CANT:350, AHORRO:18000000 },
+    { REGION:'TOLIMA', SECTOR:'Zona Centro',  MES:'abril', CANT:150, AHORRO: 8000000 },
+    { REGION:'TOLIMA', SECTOR:'Zona Norte',   MES:'mayo',  CANT:200, AHORRO:11000000 },
+    { REGION:'TOLIMA', SECTOR:'Zona Sur',     MES:'junio', CANT:250, AHORRO:13000000 },
+    { REGION:'TOLIMA', SECTOR:'Zona Oriente', MES:'julio', CANT:180, AHORRO: 6000000 },
   ];
-  // ============================================
+  // ===========================================================
 
-  // variables de estado
-  let chartLinea, chartBarras, chartTorta;
+  let charts = {};
+  const MESES_ORD = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fmtMoney = n => '$ '+Number(n||0).toLocaleString('es-CO');
+  const uniq = (arr,key) => [...new Set(arr.map(x=>x[key]).filter(Boolean))];
+  const cap = s => (s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
 
-  // helpers
-  function formatMoney(n){ return '$ ' + Number(n).toLocaleString('es-CO'); }
-  function unique(arr,key){ return [...new Set(arr.map(x=>x[key]||'').filter(Boolean))]; }
-
-  // poblar filtros iniciales
   function poblarFiltros(){
     const regSel = document.getElementById('filterRegion');
     const sectorSel = document.getElementById('filterSector');
     const mesSel = document.getElementById('filterMes');
 
-    const regiones = unique(datos,'REGION');
-    const sectores = unique(datos,'SECTOR');
-    const meses = unique(datos,'MES').sort((a,b)=> a.localeCompare(b, 'es', {sensitivity:'base'}) );
+    // Regiones
+    uniq(datos,'REGION').forEach(r=>{ const o=document.createElement('option'); o.value=r; o.textContent=r; regSel.appendChild(o); });
 
-    // llenar
-    regiones.forEach(r => {
-      const opt = document.createElement('option'); opt.value = r; opt.textContent = r; regSel.appendChild(opt);
-    });
+    // Sectores y Meses (globales)
+    const sectores = uniq(datos,'SECTOR');
     sectorSel.innerHTML = '<option value="ALL">Todos</option>' + sectores.map(s=>`<option value="${s}">${s}</option>`).join('');
-    mesSel.innerHTML = '<option value="ALL">Todos</option>' + meses.map(m=>`<option value="${m}">${m}</option>`).join('');
+    const meses = uniq(datos,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+    mesSel.innerHTML = '<option value="ALL">Todos</option>' + meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
   }
 
-  // aplicar filtros
-  function aplicarFiltros(){
-    const r = document.getElementById('filterRegion').value;
+  function filtrarBase(){
     const s = document.getElementById('filterSector').value;
     const m = document.getElementById('filterMes').value;
-    const q = document.getElementById('quickSearch').value.toLowerCase();
-
     return datos.filter(d=>{
-      if(r!=='ALL' && d.REGION !== r) return false;
-      if(s!=='ALL' && d.SECTOR !== s) return false;
-      if(m!=='ALL' && d.MES !== m) return false;
-      if(q){
-        const hay = (d.SECTOR + ' ' + d.MES + ' ' + d.REGION).toLowerCase();
-        if(!hay.includes(q)) return false;
-      }
+      if(s!=='ALL' && d.SECTOR!==s) return false;
+      if(m!=='ALL' && d.MES!==m) return false;
       return true;
     });
   }
 
-  // renderiza KPIs
-  function renderKPIs(list){
-    const total = list.reduce((a,b)=>a + (b.VALOR_SUSPENSION||0), 0);
-    const cant = list.reduce((a,b)=>a + (b.CANT||0), 0);
-    const months = unique(list,'MES').length || 1;
-    const ticket = cant ? Math.round(total / cant) : 0;
+  function render(){
+    const region = document.getElementById('filterRegion').value;
+    const base = filtrarBase();
 
-    document.getElementById('acumuladoTotal').innerHTML = formatMoney(total) + '<br><small>ACUMULADO ACTUAL</small>';
-    document.getElementById('acumuladoLarge').textContent = formatMoney(total);
-    document.getElementById('kpiAcum').textContent = formatMoney(total);
-    document.getElementById('kpiCant').textContent = cant.toLocaleString();
-    document.getElementById('kpiPromMes').textContent = Math.round(cant / months).toLocaleString();
-    document.getElementById('ticketProm').textContent = formatMoney(ticket);
+    if(region==='ALL'){
+      // vista separada por región
+      document.getElementById('panelGlobal').style.display = 'none';
+      document.getElementById('panelSplit').style.display = '';
 
-    // top sector
-    const bySector = {};
-    list.forEach(r => { bySector[r.SECTOR] = (bySector[r.SECTOR] || 0) + (r.VALOR_SUSPENSION||0); });
-    const entries = Object.entries(bySector).sort((a,b)=>b[1]-a[1]);
-    if(entries.length){
-      document.getElementById('kpiTopSector').textContent = entries[0][0];
-      const pct = Math.round(entries[0][1] / (total || 1) * 100);
-      document.getElementById('kpiTopPct').textContent = pct + '%';
-    } else {
-      document.getElementById('kpiTopSector').textContent = '-';
-      document.getElementById('kpiTopPct').textContent = '0%';
+      const valle = base.filter(d=>d.REGION==='VALLE');
+      const tolima = base.filter(d=>d.REGION==='TOLIMA');
+
+      renderKPIs([...valle, ...tolima]);
+      renderRegionPanels('V', 'VALLE', valle);
+      renderRegionPanels('T', 'TOLIMA', tolima);
+      renderTopSectores([...valle, ...tolima]);
+    }else{
+      // vista global (una región específica)
+      document.getElementById('panelGlobal').style.display = '';
+      document.getElementById('panelSplit').style.display = 'none';
+
+      const list = base.filter(d=>d.REGION===region);
+      renderKPIs(list);
+      renderTabla('#tablaResumen tbody', '#rowsCount', list);
+      renderCharts({
+        lineaId:'chartLinea', barrasId:'chartBarras', tortaId:'chartTorta', list
+      });
+      renderTopSectores(list);
     }
   }
 
-  // renderiza tabla
-  function renderTabla(list){
-    const tbody = document.querySelector('#tablaResumen tbody');
-    tbody.innerHTML = list.map(r=>`<tr>
-      <td>${r.REGION}</td><td>${r.SECTOR}</td><td>${r.MES}</td><td>${r.CANT}</td><td>${formatMoney(r.VALOR_SUSPENSION)}</td>
-    </tr>`).join('');
-  }
-
-  // render top sectores en ol
-  function renderTopSectores(list){
-    const bySector = {};
-    list.forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR] || 0) + (r.VALOR_SUSPENSION||0); });
-    const entries = Object.entries(bySector).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    const ol = document.getElementById('topSectores');
-    ol.innerHTML = entries.length ? entries.map(e=>`<li>${e[0]} — ${formatMoney(e[1])}</li>`).join('') : '<li>No hay datos</li>';
-  }
-
-  // render charts
-  function renderCharts(list){
-    // por mes (suma valores)
-    const byMonth = {};
-    list.forEach(r=>{ byMonth[r.MES] = (byMonth[r.MES]||0) + (r.VALOR_SUSPENSION||0); });
-    const months = Object.keys(byMonth).sort((a,b)=> a.localeCompare(b, 'es', {sensitivity:'base'}));
-    const monthVals = months.map(m=>byMonth[m]);
-
-    // top sectores
-    const bySector = {};
-    list.forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.VALOR_SUSPENSION||0); });
-    const secLabels = Object.keys(bySector).sort((a,b)=>bySector[b]-bySector[a]).slice(0,8);
-    const secVals = secLabels.map(s=>bySector[s]);
-
-    // regiones
-    const byRegion = {};
-    list.forEach(r=>{ byRegion[r.REGION] = (byRegion[r.REGION]||0) + (r.VALOR_SUSPENSION||0); });
-    const regLabels = Object.keys(byRegion);
-    const regVals = regLabels.map(r=>byRegion[r]);
-
-    // destruir si existen
-    if(chartLinea) chartLinea.destroy();
-    if(chartBarras) chartBarras.destroy();
-    if(chartTorta) chartTorta.destroy();
-
-    // LINEA
-    const ctxL = document.getElementById('chartLinea');
-    chartLinea = new Chart(ctxL, {
-      type: 'line',
-      data: {
-        labels: months,
-        datasets: [{ label: 'Valor (COP)', data: monthVals, fill: true, tension: 0.3, borderWidth: 2, borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-2') || '#00a0d2', backgroundColor: 'rgba(0,160,210,0.08)' }]
-      },
-      options: { plugins: { legend:{display:false}, tooltip:{callbacks:{label(ctx){ return formatMoney(ctx.raw); }}}}, scales:{ y:{ ticks:{ callback: val => formatMoney(val) } } } }
-    });
-
-    // BARRAS
-    const ctxB = document.getElementById('chartBarras');
-    chartBarras = new Chart(ctxB, {
-      type: 'bar',
-      data: { labels: secLabels, datasets: [{ label: 'Valor (COP)', data: secVals, backgroundColor: 'rgba(0,122,90,0.85)' }]},
-      options: { plugins:{legend:{display:false}, tooltip:{callbacks:{label(ctx){ return formatMoney(ctx.raw); }}}}, scales:{ y:{ ticks:{ callback: val => formatMoney(val) } } } }
-    });
-
-    // TORTA
-    const ctxT = document.getElementById('chartTorta');
-    chartTorta = new Chart(ctxT, {
-      type: 'pie',
-      data: { labels: regLabels, datasets: [{ data: regVals, backgroundColor: ['#007a5a','#00a0d2','#f59e0b','#6b7280'] }]},
-      options: { plugins:{ legend:{ position:'bottom' }, tooltip:{ callbacks:{ label(ctx){ return ctx.label + ': ' + formatMoney(ctx.raw); }}} } }
+  function renderRegionPanels(suf, regionName, list){
+    // Tabla
+    renderTabla(`#tablaResumen${suf} tbody`, `#rowsCount${suf}`, list, true);
+    // Charts
+    renderCharts({
+      lineaId:`chartLinea${suf}`,
+      barrasId:`chartBarras${suf}`,
+      tortaId:`chartTorta${suf}`,
+      list
     });
   }
 
-  // render completo
-  function renderAll(){
-    const list = aplicarFiltros();
-    renderKPIs(list);
-    renderTabla(list);
-    renderCharts(list);
-    renderTopSectores(list);
+  function renderKPIs(list){
+    const total = list.reduce((a,b)=>a+(b.AHORRO||0),0);
+    const cant  = list.reduce((a,b)=>a+(b.CANT||0),0);
+    const months = uniq(list,'MES').length||1;
+    const ticket = cant? Math.round(total/cant):0;
+    document.getElementById('acumuladoTotal').innerHTML = fmtMoney(total)+"<br><small>ACUMULADO ACTUAL</small>";
+    document.getElementById('acumuladoLarge').textContent = fmtMoney(total);
+    document.getElementById('kpiAcum').textContent = fmtMoney(total);
+    document.getElementById('kpiCant').textContent = (cant||0).toLocaleString();
+    document.getElementById('kpiPromMes').textContent = Math.round((cant||0)/months).toLocaleString();
+
+    // crecimiento últimos 2 meses
+    const byM={}; list.forEach(r=>{ byM[r.MES]=(byM[r.MES]||0)+(r.AHORRO||0); });
+    const orden = Object.keys(byM).sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+    const last = byM[orden.at(-1)]||0, prev = byM[orden.at(-2)]||0;
+    const crec = prev? Math.round((last-prev)/prev*100):0;
+    document.getElementById('kpiCrec').textContent = (crec>=0?'+':'')+crec+'%';
   }
 
-  // inicializacion
-  function inicializar(){
+  function renderTabla(tbodySel, countSel, list, omitRegion){
+    const tbody = document.querySelector(tbodySel);
+    const rows = list.map(r=>`<tr>${omitRegion?'':`<td>${r.REGION}</td>`}<td>${r.SECTOR}</td><td>${cap(r.MES)}</td><td>${r.CANT}</td><td>${fmtMoney(r.AHORRO)}</td></tr>`).join('');
+    tbody.innerHTML = rows || '<tr><td colspan="5" style="color:#999">Sin datos</td></tr>';
+    const countEl = document.querySelector(countSel); if(countEl) countEl.textContent = list.length;
+  }
+
+  function renderCharts({lineaId,barrasId,tortaId,list}){
+    // destroy prev
+    [lineaId,barrasId,tortaId].forEach(id=>{ if(charts[id]){ charts[id].destroy(); delete charts[id]; }});
+
+    // línea por mes
+    const byMonth={}; list.forEach(r=>{ byMonth[r.MES]=(byMonth[r.MES]||0)+(r.AHORRO||0); });
+    const meses = Object.keys(byMonth).sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+    const valores = meses.map(m=>byMonth[m]);
+    charts[lineaId] = new Chart(document.getElementById(lineaId),{
+      type:'line', data:{ labels:meses.map(cap), datasets:[{ label:'Ahorro (COP)', data:valores, fill:true, tension:.3, borderWidth:2, borderColor:getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#00a0d2', backgroundColor:'rgba(0,160,210,.08)' }]},
+      options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtMoney(c.raw) } } }, scales:{ y:{ ticks:{ callback:val=>fmtMoney(val) } } } }
+    });
+
+    // barras top sectores
+    const byS={}; list.forEach(r=>{ byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0); });
+    const secLabels = Object.keys(byS).sort((a,b)=>byS[b]-byS[a]).slice(0,8);
+    const secVals = secLabels.map(s=>byS[s]);
+    charts[barrasId] = new Chart(document.getElementById(barrasId),{
+      type:'bar', data:{ labels:secLabels, datasets:[{ label:'Ahorro (COP)', data:secVals, backgroundColor:'rgba(0,122,90,0.85)' }]},
+      options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:val=>fmtMoney(val) } } } }
+    });
+
+    // torta por región
+    const byR={}; list.forEach(r=>{ byR[r.REGION]=(byR[r.REGION]||0)+(r.AHORRO||0); });
+    const regLabels = Object.keys(byR);
+    const regVals = regLabels.map(r=>byR[r]);
+    charts[tortaId] = new Chart(document.getElementById(tortaId),{
+      type:'pie', data:{ labels:regLabels, datasets:[{ data:regVals, backgroundColor:['#007a5a','#00a0d2','#f59e0b','#6b7280'] }]},
+      options:{ plugins:{ legend:{ position:'bottom' }, tooltip:{ callbacks:{ label:c=> c.label+': '+fmtMoney(c.raw) } } } }
+    });
+  }
+
+  function exportCSV(list){
+    const headers=['REGION','SECTOR','MES','CANT','AHORRO'];
+    const rows=list.map(r=>[r.REGION,r.SECTOR,r.MES,r.CANT,r.AHORRO].join(','));
+    const csv=[headers.join(','),...rows].join('
+');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='datos_filtrados.csv'; a.click(); URL.revokeObjectURL(url);
+  }
+
+  function init(){
     poblarFiltros();
+
     // eventos
-    document.getElementById('filterRegion').addEventListener('change', renderAll);
-    document.getElementById('filterSector').addEventListener('change', renderAll);
-    document.getElementById('filterMes').addEventListener('change', renderAll);
-    document.getElementById('quickSearch').addEventListener('input', renderAll);
+    document.getElementById('filterRegion').addEventListener('change', render);
+    document.getElementById('filterSector').addEventListener('change', render);
+    document.getElementById('filterMes').addEventListener('change', render);
+    document.getElementById('btnReset').addEventListener('click', ()=>{
+      document.getElementById('filterRegion').value='ALL';
+      document.getElementById('filterSector').value='ALL';
+      document.getElementById('filterMes').value='ALL';
+      render();
+    });
+    document.getElementById('btnExport').addEventListener('click', ()=>{
+      const region = document.getElementById('filterRegion').value;
+      const base = filtrarBase();
+      const list = region==='ALL'? base : base.filter(d=>d.REGION===region);
+      exportCSV(list);
+    });
 
-    // set lastUpdated ahora
-    document.getElementById('lastUpdated').textContent = 'Última carga: ' + (new Date()).toLocaleString();
-
-    // primer render
-    renderAll();
+    document.getElementById('lastUpdated').textContent = 'Última carga: '+(new Date()).toLocaleString();
+    render();
   }
 
-  // iniciar al cargar DOM
-  window.addEventListener('DOMContentLoaded', inicializar);
+  window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
-
