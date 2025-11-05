@@ -32,25 +32,28 @@
   .topcards{display:flex;gap:18px;margin-bottom:var(--gap);flex-wrap:wrap}
   .topcard{flex:1;min-width:220px;background:linear-gradient(180deg,#fff,#fbfffd);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
 
-  /* Fila principal: línea (angosta) + tabla */
+  /* Fila principal: línea (angosta) + tabla (angosta) */
   .row-main{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
   .chart-line-wrap{max-width:620px}
   .chart-line-wrap canvas{width:100% !important; height:240px !important}
 
-  /* Fila lateral: barras pequeñas en misma columna (derecha) */
-  .row-side{display:grid;grid-template-columns:auto;gap:18px;max-width:380px}
-  .chart-bar-wrap canvas{width:100% !important; height:220px !important}
-
-  .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+  /* Tabla más angosta */
+  .table-wrap{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);max-width:520px}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
   th{color:var(--muted);font-weight:600}
+
+  /* Barras pequeñas, en su columna lateral */
+  .row-side{display:grid;grid-template-columns:auto;gap:18px;max-width:380px}
+  .chart-bar-wrap canvas{width:100% !important; height:220px !important}
+
   footer{padding:18px;color:var(--muted);font-size:13px;text-align:center}
   .region-banner{font-weight:700;color:#0f172a}
 
   @media (max-width:1200px){
     .row-main{grid-template-columns:1fr}
     .chart-line-wrap{max-width:100%}
+    .table-wrap{max-width:100%}
   }
 </style>
 </head>
@@ -244,7 +247,7 @@ function actualizarSectores(region){
 }
 
 function actualizarMeses(region){
-  // Mismos meses por sector: definimos meses a nivel región (o global)
+  // Meses de referencia por región para que nunca falte un mes en sector específico
   const mesSel = document.getElementById('filterMes');
   let fuente = datos;
   if(region !== 'ALL'){
@@ -255,7 +258,7 @@ function actualizarMeses(region){
   mesSel.value = 'ALL';
 }
 
-/* ====== DATA VIEW (con regla de agregación) ====== */
+/* ====== DATA VIEW ====== */
 function filtrarBase(region){
   const sector = document.getElementById('filterSector').value;
   const mes = document.getElementById('filterMes').value;
@@ -268,7 +271,7 @@ function filtrarBase(region){
   });
 }
 
-/* ====== RENDER ====== */
+/* ====== RENDER PRINCIPAL ====== */
 function render(){
   const region = document.getElementById('filterRegion').value;
 
@@ -276,28 +279,27 @@ function render(){
     document.getElementById('panelGlobal').style.display = 'none';
     document.getElementById('panelSplit').style.display = '';
 
-    const base = filtrarBase('ALL'); // aplica mes a ambas
+    const base = filtrarBase('ALL'); // aplica Mes (si hay)
     const valle = base.filter(d=>d.REGION==='VALLE');
     const tolima = base.filter(d=>d.REGION==='TOLIMA');
 
-    renderKPIsStatic();            // ✅ acumulados estáticos
-    renderKPIsDinamic(base);       // (si quieres ver Cant, Prom, Crec del conjunto mostrado)
-    renderRegionPanels('V', valle);
-    renderRegionPanels('T', tolima);
+    renderKPIsStatic();        // acumulados fijos
+    renderKPIsDinamic(base);   // Cant, Prom, Crec del conjunto mostrado
+    renderRegionPanels('V', valle, 'VALLE');
+    renderRegionPanels('T', tolima, 'TOLIMA');
   }else{
     document.getElementById('panelGlobal').style.display = '';
     document.getElementById('panelSplit').style.display = 'none';
 
     const list = filtrarBase(region);
-    renderKPIsStatic();            // ✅ acumulados estáticos
-    renderKPIsDinamic(list);       // (Cant, Prom, Crec filtrados)
+    renderKPIsStatic();
+    renderKPIsDinamic(list);
     renderTabla('#tablaResumen tbody', '#rowsCount', list, false, region);
     renderCharts({ lineaId:'chartLinea', barrasId:'chartBarras', list, region });
   }
 }
 
-function renderRegionPanels(sufijo, list){
-  const regionName = (sufijo==='V')?'VALLE':'TOLIMA';
+function renderRegionPanels(sufijo, list, regionName){
   renderTabla(`#tablaResumen${sufijo} tbody`, `#rowsCount${sufijo}`, list, true, regionName);
   renderCharts({
     lineaId:`chartLinea${sufijo}`,
@@ -308,13 +310,10 @@ function renderRegionPanels(sufijo, list){
 }
 
 /* ====== KPIs ====== */
-// ✅ ACUMULADOS ESTÁTICOS (NO cambian con filtros)
 function renderKPIsStatic(){
   const totalAll = datos.reduce((a,b)=>a+(b.AHORRO||0),0);
-  const ticketAll = (()=>{
-    const cantAll = datos.reduce((a,b)=>a+(b.CANT||0),0);
-    return cantAll? Math.round(totalAll/cantAll):0;
-  })();
+  const cantAll  = datos.reduce((a,b)=>a+(b.CANT||0),0);
+  const ticketAll = cantAll? Math.round(totalAll/cantAll):0;
 
   document.getElementById('acumuladoTotal').innerHTML = fmtMoney(totalAll)+"<br><small>ACUMULADO ACTUAL</small>";
   document.getElementById('acumuladoLarge').textContent = fmtMoney(totalAll);
@@ -322,7 +321,6 @@ function renderKPIsStatic(){
   document.getElementById('ticketProm').textContent = fmtMoney(ticketAll);
 }
 
-// KPIs dinámicos (sí dependen de filtros): Cant, Promedio/mes, Crec.
 function renderKPIsDinamic(list){
   const cant  = list.reduce((a,b)=>a+(b.CANT||0),0);
   const months = uniq(list,'MES').length||1;
@@ -330,7 +328,6 @@ function renderKPIsDinamic(list){
   document.getElementById('kpiCant').textContent = (cant||0).toLocaleString();
   document.getElementById('kpiPromMes').textContent = Math.round((cant||0)/months).toLocaleString();
 
-  // crecimiento últimos 2 meses (del conjunto mostrado)
   const byM={}; list.forEach(r=>{ byM[r.MES]=(byM[r.MES]||0)+(r.AHORRO||0); });
   const orden = Object.keys(byM).sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
   let last=0, prev=0;
@@ -340,65 +337,68 @@ function renderKPIsDinamic(list){
   document.getElementById('kpiCrec').textContent = (crec>=0?'+':'')+crec+'%';
 }
 
-/* ====== TABLA (agrega por sector si mes=ALL y muestra TODOS los sectores) ====== */
+/* ====== TABLA (respeta reglas de sector/mes + ceros) ====== */
 function renderTabla(tbodySel, countSel, list, omitRegion, regionName){
   const mesSel = document.getElementById('filterMes').value;
+  const sectorSel = document.getElementById('filterSector').value;
   const tbody = document.querySelector(tbodySel);
 
-  // referencia de sectores que SIEMPRE deben verse
-  const sectoresRef = regionName
-    ? sectoresPorRegion(regionName)
-    : uniq(list, 'SECTOR'); // fallback para split
+  // referencia meses/sectores de la región para no perder filas
+  const mesesRef = (regionName && regionName!=='ALL')
+      ? uniq(datos.filter(d=>d.REGION===regionName),'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()))
+      : uniq(list,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+
+  const sectoresRef = (regionName && regionName!=='ALL')
+      ? sectoresPorRegion(regionName)
+      : uniq(list,'SECTOR');
 
   let filas = [];
 
-  if (mesSel === 'ALL') {
-    // Agregado por sector (suma todos los meses), garantizando todos los sectores
-    sectoresRef.forEach(sec => {
-      const rowsSec = list.filter(x => x.SECTOR === sec);
-      const regionRow = regionName || (rowsSec[0]?.REGION || '');
-      const sumCant = rowsSec.reduce((a,b)=>a+(b.CANT||0),0);
-      const sumAho  = rowsSec.reduce((a,b)=>a+(b.AHORRO||0),0);
-      filas.push({
-        REGION: regionRow,
-        SECTOR: sec,
-        MES: 'Todos',
-        CANT: sumCant,
-        AHORRO: sumAho
+  if(sectorSel==='ALL'){
+    if(mesSel==='ALL'){
+      // Totales por sector (suma de todos los meses)
+      sectoresRef.forEach(sec=>{
+        const rowsSec = list.filter(x=>x.SECTOR===sec);
+        const regionRow = regionName || (rowsSec[0]?.REGION || '');
+        const sumCant = rowsSec.reduce((a,b)=>a+(b.CANT||0),0);
+        const sumAho  = rowsSec.reduce((a,b)=>a+(b.AHORRO||0),0);
+        filas.push({REGION:regionRow, SECTOR:sec, MES:'Todos', CANT:sumCant, AHORRO:sumAho});
       });
-    });
-  } else {
-    // Mes específico: muestra TODOS los sectores; si no hay dato, va 0
-    sectoresRef.forEach(sec => {
-      const match = list.find(x => x.SECTOR === sec && x.MES === mesSel);
-      if (match) {
-        filas.push({
-          REGION: match.REGION,
-          SECTOR: sec,
-          MES: mesSel,
-          CANT: match.CANT || 0,
-          AHORRO: match.AHORRO || 0
-        });
-      } else {
-        filas.push({
-          REGION: regionName || '',
-          SECTOR: sec,
-          MES: mesSel,
-          CANT: 0,
-          AHORRO: 0
-        });
-      }
-    });
+    }else{
+      // Mes específico para TODOS los sectores (si no hay dato, 0)
+      sectoresRef.forEach(sec=>{
+        const m = list.find(x=>x.SECTOR===sec && x.MES===mesSel);
+        if(m) filas.push({REGION:m.REGION, SECTOR:sec, MES:mesSel, CANT:m.CANT||0, AHORRO:m.AHORRO||0});
+        else  filas.push({REGION:regionName||'', SECTOR:sec, MES:mesSel, CANT:0, AHORRO:0});
+      });
+    }
+  }else{
+    // Sector específico
+    if(mesSel==='ALL'){
+      // Mostrar TODOS los meses con 0 donde no haya
+      mesesRef.forEach(m=>{
+        const r = list.find(x=>x.SECTOR===sectorSel && x.MES===m);
+        if(r) filas.push({REGION:r.REGION, SECTOR:sectorSel, MES:m, CANT:r.CANT||0, AHORRO:r.AHORRO||0});
+        else  filas.push({REGION:regionName||'', SECTOR:sectorSel, MES:m, CANT:0, AHORRO:0});
+      });
+    }else{
+      // Solo ese mes para el sector (0 si no hay)
+      const r = list.find(x=>x.SECTOR===sectorSel && x.MES===mesSel);
+      if(r) filas.push({REGION:r.REGION, SECTOR:sectorSel, MES:mesSel, CANT:r.CANT||0, AHORRO:r.AHORRO||0});
+      else  filas.push({REGION:regionName||'', SECTOR:sectorSel, MES:mesSel, CANT:0, AHORRO:0});
+    }
   }
 
-  // Orden opcional por Ahorro desc
-  filas.sort((a,b) => (b.AHORRO - a.AHORRO));
+  // Orden por Ahorro desc salvo vista sector-específico & mes=ALL (ahí orden por mes)
+  if(!(sectorSel!=='ALL' && mesSel==='ALL')){
+    filas.sort((a,b)=> (b.AHORRO - a.AHORRO));
+  }
 
-  const rowsHTML = filas.map(r => `
+  const rowsHTML = filas.map(r=>`
     <tr>
       ${omitRegion ? '' : `<td>${r.REGION}</td>`}
       <td>${r.SECTOR}</td>
-      <td>${r.MES === 'Todos' ? 'Todos' : (r.MES.charAt(0).toUpperCase()+r.MES.slice(1).toLowerCase())}</td>
+      <td>${r.MES==='Todos'?'Todos':cap(r.MES)}</td>
       <td>${r.CANT}</td>
       <td>${fmtMoney(r.AHORRO)}</td>
     </tr>
@@ -406,48 +406,73 @@ function renderTabla(tbodySel, countSel, list, omitRegion, regionName){
 
   tbody.innerHTML = rowsHTML || `<tr><td colspan="${omitRegion?4:5}" style="color:#999">Sin datos</td></tr>`;
   const countEl = document.querySelector(countSel);
-  if (countEl) countEl.textContent = filas.length;
+  if(countEl) countEl.textContent = filas.length;
 }
 
-/* ====== CHARTS ====== */
+/* ====== CHARTS (barras naranja, lógica por sector) ====== */
 function renderCharts({lineaId,barrasId,list,region}){
   [lineaId,barrasId].forEach(id=>{ if(charts[id]){ charts[id].destroy(); delete charts[id]; }});
 
-  // -------- Línea por mes (NO excluye meses)
-  let fuenteMes = datos;
-  if(region){ fuenteMes = datos.filter(d=>d.REGION===region); }
-  const mesesRef = uniq(fuenteMes,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
+  const mesSel = document.getElementById('filterMes').value;
+  const sectorSel = document.getElementById('filterSector').value;
 
-  const byMonth={}; mesesRef.forEach(m=>byMonth[m]=0);
-  list.forEach(r=>{ byMonth[r.MES] = (byMonth[r.MES]||0) + (r.AHORRO||0); });
+  // --- Línea por mes (si sector específico, la serie es del sector; si no, total de la región)
+  const mesesRef = (region && region!=='ALL')
+      ? uniq(datos.filter(d=>d.REGION===region),'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()))
+      : uniq(list,'MES').sort((a,b)=> MESES_ORD.indexOf(a.toLowerCase())-MESES_ORD.indexOf(b.toLowerCase()));
 
-  const meses = mesesRef;
-  const valores = meses.map(m=>byMonth[m]);
+  const byMonth = {}; mesesRef.forEach(m=>byMonth[m]=0);
+  if(sectorSel==='ALL'){
+    // total de la región por mes
+    list.forEach(r=>{ byMonth[r.MES] = (byMonth[r.MES]||0) + (r.AHORRO||0); });
+  }else{
+    // solo el sector por mes (cero si no hay)
+    mesesRef.forEach(m=>{
+      const r = list.find(x=>x.SECTOR===sectorSel && x.MES===m);
+      byMonth[m] = r ? (r.AHORRO||0) : 0;
+    });
+  }
+
   charts[lineaId] = new Chart(document.getElementById(lineaId),{
     type:'line',
-    data:{ labels:meses.map(cap), datasets:[{ label:'Ahorro (COP)', data:valores, fill:true, tension:.3, borderWidth:2, borderColor:getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#00a0d2', backgroundColor:'rgba(0,160,210,.08)' }]},
+    data:{ labels:mesesRef.map(cap), datasets:[{ label:'Ahorro (COP)', data:mesesRef.map(m=>byMonth[m]), fill:true, tension:.3, borderWidth:2, borderColor:getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#00a0d2', backgroundColor:'rgba(0,160,210,.08)' }]},
     options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtMoney(c.raw) } } }, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
   });
 
-  // -------- Barras por sector (NARANJA)
-  const mesSel = document.getElementById('filterMes').value;
-  const byS={};
-  if(mesSel === 'ALL'){
-    list.forEach(r=>{ byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0); });
-  }else{
-    list.filter(r=>r.MES===mesSel).forEach(r=>{ byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0); });
-    // Garantiza que aparezcan todos los sectores esperados con 0 si no hay fila del mes
+  // --- Barras
+  if(sectorSel==='ALL'){
+    // Barras por SECTOR
     const sectoresRef = region? sectoresPorRegion(region) : uniq(list,'SECTOR');
-    sectoresRef.forEach(s=>{ if(!(s in byS)) byS[s]=0; });
-  }
-  const secLabels = Object.keys(byS).sort((a,b)=>byS[b]-byS[a]);
-  const secVals = secLabels.map(s=>byS[s]);
+    const bySector={}; sectoresRef.forEach(s=>bySector[s]=0);
+    if(mesSel==='ALL'){
+      list.forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.AHORRO||0); });
+    }else{
+      list.filter(r=>r.MES===mesSel).forEach(r=>{ bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.AHORRO||0); });
+      // aseguro todos los sectores
+      sectoresRef.forEach(s=>{ if(!(s in bySector)) bySector[s]=0; });
+    }
+    const labels = Object.keys(bySector);
+    const values = labels.map(l=>bySector[l]);
 
-  charts[barrasId] = new Chart(document.getElementById(barrasId),{
-    type:'bar',
-    data:{ labels:secLabels, datasets:[{ label:(mesSel==='ALL'?'Total ':'Mes ' + cap(mesSel)+' ')+'Ahorro (COP)', data:secVals, backgroundColor:'rgba(242,140,0,0.9)' }]},
-    options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
-  });
+    charts[barrasId] = new Chart(document.getElementById(barrasId),{
+      type:'bar',
+      data:{ labels, datasets:[{ label:(mesSel==='ALL'?'Total ':'Mes '+cap(mesSel)+' ')+'Ahorro (COP)', data:values, backgroundColor:'rgba(242,140,0,0.9)' }]},
+      options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
+    });
+
+  }else{
+    // Barras por MES del sector seleccionado
+    const values = mesesRef.map(m=>{
+      const r = list.find(x=>x.SECTOR===sectorSel && x.MES===m);
+      return r ? (r.AHORRO||0) : 0;
+    });
+
+    charts[barrasId] = new Chart(document.getElementById(barrasId),{
+      type:'bar',
+      data:{ labels:mesesRef.map(cap), datasets:[{ label:'Ahorro (COP) — '+sectorSel, data:values, backgroundColor:'rgba(242,140,0,0.9)' }]},
+      options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}}, scales:{ y:{ ticks:{ callback:v=>fmtMoney(v) } } } }
+    });
+  }
 }
 
 /* ====== Utilidades ====== */
@@ -478,9 +503,9 @@ function init(){
 
   document.getElementById('lastUpdated').textContent = 'Última carga: '+(new Date()).toLocaleString();
 
-  // Primer pintado
-  renderKPIsStatic(); // pinta acumulados fijos desde el inicio
-  render();           // pinta el resto (tabla + charts)
+  // Pintado inicial
+  renderKPIsStatic();
+  render();
 }
 
 window.addEventListener('DOMContentLoaded', init);
