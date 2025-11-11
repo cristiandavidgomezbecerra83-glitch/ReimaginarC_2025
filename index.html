@@ -41,7 +41,7 @@ button:hover{opacity:.9}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
 th{color:#6b7280;font-weight:600}
-.chart-bar-wrap canvas{flex:1;width:100%!important;height:100%!important}
+.chart-bar-wrap canvas{flex:1;width:100%!important;height:340px!important}
 
 .kpi-box{background:linear-gradient(135deg,#fff,#f9fafb);border-left:5px solid var(--accent);padding:10px 14px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow);}
 .kpi-label{color:#6b7280;font-size:13px}
@@ -70,7 +70,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
   <button class="tabbtn" data-tab="page2">Info_Cobro_Revision</button>
 </div>
 
-<!-- ====== HOJA 1: SUSPENSIONES ====== -->
 <section id="page1" class="page active">
   <div class="layout">
     <aside class="sidebar">
@@ -79,8 +78,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
         <div style="margin-bottom:14px;color:#6b7280;font-size:13px">
           <small>Monitoreo de suspensiones por región, sector y mes.</small>
         </div>
-
-        <!-- Filtros -->
         <div class="filters">
           <div><label>Región</label><select id="filterRegion"><option value="ALL">Todos</option></select></div>
           <div><label>Sector / Zona</label><select id="filterSector" disabled><option value="ALL">Todos</option></select></div>
@@ -88,7 +85,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
           <div class="toolbar" style="margin-top:10px"><button id="btnReset">Limpiar filtros</button></div>
         </div>
 
-        <!-- KPIs -->
         <div style="margin-top:18px;border-top:1px solid #e5e7eb;padding-top:14px;display:grid;gap:12px">
           <div class="kpi-box">
             <span class="kpi-label">Valor proyectado</span>
@@ -115,7 +111,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
               </table>
             </div>
           </div>
-
           <div class="chart-bar-wrap">
             <h3 style="margin:6px;color:#0f172a;font-size:15px;font-weight:600">Ahorro por sector</h3>
             <canvas id="chartBarras"></canvas>
@@ -126,7 +121,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
   </div>
 </section>
 
-<!-- ====== HOJA 2: COBRO REVISION ====== -->
 <section id="page2" class="page">
   <div class="layout" style="grid-template-columns:1fr">
     <div class="card" style="text-align:center;background:#fff5ec;border-left:5px solid var(--accent);font-weight:700;">INFORMACIÓN PROYECTO REIMAGINAR_CE — COBRO DE REVISIÓN EN CAMBIOS DE MEDIDOR</div>
@@ -144,7 +138,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
           <canvas id="revBarPct"></canvas>
         </div>
       </div>
-
       <div class="table-wrap">
         <h4 style="margin:0 0 8px 0;color:#0f172a">Resumen mensual</h4>
         <div class="table-scroll">
@@ -225,36 +218,25 @@ function render(){
   renderBars('chartBarras',list,region);
   renderKPIsAhorro();
 }
-function renderTabla(tbodySel,countSel,list,omitRegion,regionName){
-  const tbody=document.querySelector(tbodySel);
-  const sectores=regionName==='VALLE'?sectoresPorRegion('VALLE'):sectoresPorRegion('TOLIMA');
-  let filas=[];
-  sectores.forEach(sec=>{
-    const rows=list.filter(x=>x.SECTOR===sec);
-    const reg=rows[0]?.REGION||regionName;
-    const sC=rows.reduce((a,b)=>a+(b.CANT||0),0);
-    const sA=rows.reduce((a,b)=>a+(b.AHORRO||0),0);
-    filas.push({REGION:reg,SECTOR:sec,MES:'Todos',CANT:sC,AHORRO:sA});
-  });
-  tbody.innerHTML=filas.map(r=>`
-  <tr><td>${r.REGION}</td><td>${r.SECTOR}</td><td>${cap(r.MES)}</td>
-  <td>${r.CANT}</td><td>${fmtMoney(r.AHORRO)}</td></tr>`).join('');
-  document.querySelector(countSel).textContent=filas.length;
-}
+
+// ✅ FIX — Sin bucle de crecimiento
 function renderBars(id,list,region){
-  if(charts[id]){charts[id].destroy();}
+  if(charts[id]){charts[id].destroy();charts[id]=null;}
+  const canvas=document.getElementById(id);
+  canvas.style.height='340px';canvas.style.width='100%';
   const sectRef=region?sectoresPorRegion(region):uniq(list,'SECTOR');
   const byS={};sectRef.forEach(s=>byS[s]=0);
   list.forEach(r=>{byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0);});
   const labels=Object.keys(byS);const values=labels.map(l=>byS[l]);
-  charts[id]=new Chart(document.getElementById(id),{
+  requestAnimationFrame(()=>{charts[id]=new Chart(canvas,{
     type:'bar',
-    data:{labels,datasets:[{data:values,backgroundColor:'rgba(242,140,0,0.85)',borderColor:'rgba(242,140,0,1)',borderWidth:1.2,borderRadius:10,barThickness:32}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:900,easing:'easeOutQuart'},
+    data:{labels,datasets:[{data:values,backgroundColor:'rgba(242,140,0,0.85)',borderColor:'rgba(242,140,0,1)',borderWidth:1.2,borderRadius:10,barThickness:30}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:700,easing:'easeOutQuart'},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}},
       scales:{y:{beginAtZero:true,grid:{color:'rgba(148,163,184,.15)'},ticks:{callback:v=>fmtMoney(v)}}}}
-  });
+  });});
 }
+
 function renderKPIsAhorro(){
   const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
   const proy=Number(document.getElementById('inputValorProy').value)||0;
@@ -269,10 +251,11 @@ function renderKPIsAhorro(){
 document.getElementById('inputValorProy').addEventListener('input',renderKPIsAhorro);
 
 function renderRevision(){
+  if(charts['revBarPct']){charts['revBarPct'].destroy();charts['revBarPct']=null;}
   const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
   const valle=datos.filter(d=>d.REGION==='VALLE').reduce((a,b)=>a+(b.AHORRO||0),0);
   const tolima=datos.filter(d=>d.REGION==='TOLIMA').reduce((a,b)=>a+(b.AHORRO||0),0);
-  const metaTotal=840000000, metaValle=340000000, metaTolima=500000000;
+  const metaTotal=840000000,metaValle=340000000,metaTolima=500000000;
   const falt=Math.max(metaTotal-total,0);
   const meses=uniq(datos,'MES').length||1;
   const promMes=Math.round(total/meses);
@@ -280,25 +263,19 @@ function renderRevision(){
   document.getElementById('revKpiActual').textContent=fmtMoney(total);
   document.getElementById('revKpiFaltante').textContent=fmtMoney(falt);
   document.getElementById('revKpiPromMes').textContent=fmtMoney(promMes);
-
-  if(charts['revBarPct']){charts['revBarPct'].destroy();}
   charts['revBarPct']=new Chart(document.getElementById('revBarPct'),{
     type:'bar',
-    data:{labels:['TOLIMA','VALLE'],datasets:[{data:[(tolima/metaTolima*100),(valle/metaValle*100)],backgroundColor:['#0ea5a5','#22c55e'],borderRadius:10,barThickness:30}]},
+    data:{labels:['TOLIMA','VALLE'],datasets:[{data:[(tolima/metaTolima*100),(valle/metaValle*100)],backgroundColor:['#0ea5a5','#22c55e'],borderRadius:10,barThickness:28}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+' %'}}},
       scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+' %'},grid:{color:'rgba(203,213,225,.4)'}},y:{grid:{display:false}}}}
   });
-
   const mesesRef=['febrero','marzo','abril','mayo','junio','julio'];
-  const mat={VALLE:{},TOLIMA:{}};
-  mesesRef.forEach(m=>{mat.VALLE[m]=0;mat.TOLIMA[m]=0;});
+  const mat={VALLE:{},TOLIMA:{}};mesesRef.forEach(m=>{mat.VALLE[m]=0;mat.TOLIMA[m]=0;});
   datos.forEach(d=>{const m=d.MES.toLowerCase();if(mesesRef.includes(m)){mat[d.REGION][m]=(mat[d.REGION][m]||0)+(d.AHORRO||0);}});
   const tb=document.querySelector('#revTabla tbody');const tf=document.querySelector('#revTabla tfoot');
   const fmt=v=>v?'$ '+Math.round(v/1_000_000)+' mill.':'$ 0 mill.';
-  const rowT=`<tr><td>TOLIMA</td>${mesesRef.map(m=>`<td>${fmt(mat.TOLIMA[m])}</td>`).join('')}</tr>`;
-  const rowV=`<tr><td>VALLE</td>${mesesRef.map(m=>`<td>${fmt(mat.VALLE[m])}</td>`).join('')}</tr>`;
-  tb.innerHTML=rowT+rowV;
+  tb.innerHTML=`<tr><td>TOLIMA</td>${mesesRef.map(m=>`<td>${fmt(mat.TOLIMA[m])}</td>`).join('')}</tr><tr><td>VALLE</td>${mesesRef.map(m=>`<td>${fmt(mat.VALLE[m])}</td>`).join('')}</tr>`;
   const totales=mesesRef.map(m=>(mat.TOLIMA[m]||0)+(mat.VALLE[m]||0));
   tf.innerHTML=`<tr><td><strong>Total</strong></td>${totales.map(v=>`<td><strong>${fmt(v)}</strong></td>`).join('')}</tr>`;
 }
