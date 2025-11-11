@@ -5,16 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reimaginar_CE — Suspensiones & Revisión</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-<!-- =======================================================
- 🧭 SECCIÓN: ESTILOS GLOBALES Y DISEÑO GERENCIAL
-======================================================= -->
 <style>
 :root{
   --bg:#f4f7f9; --card:#fff; --muted:#6b7280; --ink:#0f172a;
   --accent:#F28C00; --success:#22c55e; --info:#0ea5a5;
   --shadow:0 6px 18px rgba(16,24,40,.08); --radius:12px;
-  font-family:"Inter", system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+  font-family:"Inter", system-ui, -apple-system,'Segoe UI',Roboto,Arial;
 }
 html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg) 0%, #eef6f5 100%);}
 header{display:flex;align-items:center;gap:15px;padding:10px 20px;border-bottom:4px solid var(--accent);background:#fff;box-shadow:var(--shadow);}
@@ -58,10 +54,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
 </style>
 </head>
 <body>
-
-<!-- =======================================================
- 🏢 SECCIÓN: ENCABEZADO GLOBAL
-======================================================= -->
 <header>
   <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia">
   <div>
@@ -74,34 +66,23 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
   </div>
 </header>
 
-<!-- =======================================================
- 🧩 SECCIÓN: PESTAÑAS PRINCIPALES
-======================================================= -->
 <div class="tabs">
   <button class="tabbtn active" data-tab="page1">Info_Suspensiones</button>
   <button class="tabbtn" data-tab="page2">Info_Cobro_Revision</button>
 </div>
 
-<!-- =======================================================
- 📊 SECCIÓN: INFO_SUSPENSIONES
-======================================================= -->
+<!-- HOJA 1 -->
 <section id="page1" class="page active">
   <div class="layout">
-    <!-- Panel lateral izquierdo -->
     <aside class="sidebar">
       <div class="card">
         <h3 style="margin-top:0;color:#0f172a;font-weight:700">Resumen Ahorro</h3>
-        <div style="margin-bottom:14px;color:#6b7280;font-size:13px">
-          <small>Monitoreo de suspensiones por región, sector y mes.</small>
-        </div>
         <div class="filters">
           <div><label>Región</label><select id="filterRegion"><option value="ALL">Todos</option></select></div>
           <div><label>Sector / Zona</label><select id="filterSector" disabled><option value="ALL">Todos</option></select></div>
           <div><label>Mes</label><select id="filterMes"><option value="ALL">Todos</option></select></div>
           <div class="toolbar" style="margin-top:10px"><button id="btnReset">Limpiar filtros</button></div>
         </div>
-
-        <!-- KPIs -->
         <div style="margin-top:18px;border-top:1px solid #e5e7eb;padding-top:14px;display:grid;gap:12px">
           <div class="kpi-box"><span class="kpi-label">Valor proyectado</span><span id="valorProyectado" class="kpi-value">$ 6,000,000,000</span></div>
           <div class="kpi-box kpi-green"><span class="kpi-label">Total actual</span><span id="kpiTotalActual" class="kpi-value">$ 0</span></div>
@@ -111,7 +92,6 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
       </div>
     </aside>
 
-    <!-- Contenido principal -->
     <main>
       <section id="panelGlobal">
         <div class="row-main">
@@ -136,9 +116,7 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
   </div>
 </section>
 
-<!-- =======================================================
- 💰 SECCIÓN: INFO_COBRO_REVISION
-======================================================= -->
+<!-- HOJA 2 -->
 <section id="page2" class="page">
   <div class="layout" style="grid-template-columns:1fr">
     <div class="card" style="text-align:center;background:#fff5ec;border-left:5px solid var(--accent);font-weight:700;">
@@ -155,7 +133,7 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
         </div>
         <div class="chart-bar-wrap" style="flex:1">
           <h4 style="margin:4px 0 10px 0;color:#0f172a">Porcentaje de Avance por Departamento</h4>
-          <canvas id="revBarPct"></canvas>
+          <canvas id="revBarPct" style="height:260px!important"></canvas>
         </div>
       </div>
       <div class="table-wrap">
@@ -171,16 +149,10 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
   </div>
 </section>
 
-<!-- =======================================================
- ⚙️ SECCIÓN: PIE DE PÁGINA
-======================================================= -->
 <footer>© 2025 · Celsia · Tablero Reimaginar_CE · Visión Gerencial ⚡</footer>
 
-<!-- =======================================================
- 🧠 SECCIÓN: SCRIPT PRINCIPAL (LÓGICA Y GRÁFICAS)
-======================================================= -->
 <script>
-const datos=[
+const datosSuspensiones=[
   {REGION:'VALLE',SECTOR:'CENTRO',MES:'abril',CANT:200,AHORRO:15000000},
   {REGION:'VALLE',SECTOR:'NORTE',MES:'abril',CANT:300,AHORRO:18000000},
   {REGION:'VALLE',SECTOR:'PACIFICO',MES:'mayo',CANT:400,AHORRO:25000000},
@@ -190,10 +162,15 @@ const datos=[
   {REGION:'TOLIMA',SECTOR:'Zona Sur',MES:'junio',CANT:250,AHORRO:13000000},
   {REGION:'TOLIMA',SECTOR:'Zona Oriente',MES:'julio',CANT:180,AHORRO:6000000},
 ];
+const datosRevision=[
+  {REGION:'VALLE',MES:'febrero',AHORRO:22000000},
+  {REGION:'VALLE',MES:'marzo',AHORRO:35000000},
+  {REGION:'TOLIMA',MES:'febrero',AHORRO:15000000},
+  {REGION:'TOLIMA',MES:'marzo',AHORRO:17000000},
+];
 const MESES_ORD=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const fmtMoney=n=>'$ '+Number(n||0).toLocaleString('es-CO');
 const uniq=(arr,key)=>[...new Set(arr.map(x=>x[key]).filter(Boolean))];
-const cap=s=>(s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
 let charts={};
 
 document.querySelectorAll('.tabbtn').forEach(btn=>{
@@ -202,109 +179,50 @@ document.querySelectorAll('.tabbtn').forEach(btn=>{
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
-    if(btn.dataset.tab==='page1'){render();} else {renderRevision();}
+    if(btn.dataset.tab==='page1'){renderSuspensiones();} else {renderRevision();}
   });
 });
 
-function sectoresPorRegion(r){return r==='VALLE'?['CENTRO','NORTE','PACIFICO','SUR']:['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];}
-function poblarFiltrosIniciales(){
-  const regSel=document.getElementById('filterRegion');
-  uniq(datos,'REGION').forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;regSel.appendChild(o);});
-  actualizarMeses('ALL');actualizarSectores('ALL');
-}
-function actualizarSectores(region){
-  const sel=document.getElementById('filterSector');
-  const disabled=(region==='ALL');sel.disabled=disabled;
-  let ops=[];
-  if(region==='VALLE')ops=['CENTRO','NORTE','PACIFICO','SUR'];
-  if(region==='TOLIMA')ops=['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
-  sel.innerHTML='<option value="ALL">Todos</option>'+ops.map(s=>`<option>${s}</option>`).join('');
-  sel.value='ALL';
-}
-function actualizarMeses(region){
-  const mesSel=document.getElementById('filterMes');
-  let fuente=datos;if(region!=='ALL')fuente=datos.filter(d=>d.REGION===region);
-  const meses=uniq(fuente,'MES').sort((a,b)=>MESES_ORD.indexOf(a)-MESES_ORD.indexOf(b));
-  mesSel.innerHTML='<option value="ALL">Todos</option>'+meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
-}
-function filtrarBase(region){
-  const sector=document.getElementById('filterSector').value;
-  const mes=document.getElementById('filterMes').value;
-  return datos.filter(d=>{
-    if(region!=='ALL'&&d.REGION!==region)return false;
-    if(sector!=='ALL'&&d.SECTOR!==sector)return false;
-    if(mes!=='ALL'&&d.MES!==mes)return false;
-    return true;
-  });
-}
-function render(){
-  const region=document.getElementById('filterRegion').value;
-  const list=filtrarBase(region);
-  renderTabla('#tablaResumen tbody','#rowsCount',list,false,region);
-  renderBars('chartBarras',list,region);
-  renderKPIsAhorro();
-}
-
-function renderBars(id,list,region){
-  if(charts[id]){charts[id].destroy();charts[id]=null;}
-  const canvas=document.getElementById(id);
-  const sectRef=region?sectoresPorRegion(region):uniq(list,'SECTOR');
-  const byS={};sectRef.forEach(s=>byS[s]=0);
-  list.forEach(r=>{byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0);});
-  const labels=Object.keys(byS);const values=labels.map(l=>byS[l]);
-  charts[id]=new Chart(canvas,{
-    type:'bar',
-    data:{labels,datasets:[{data:values,backgroundColor:'rgba(242,140,0,0.85)',borderColor:'rgba(242,140,0,1)',borderWidth:1.2,borderRadius:10,barThickness:30}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600,easing:'easeOutQuart'},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}},
-      scales:{y:{beginAtZero:true,grid:{color:'rgba(148,163,184,.15)'},ticks:{callback:v=>fmtMoney(v)}}}}
-  });
-}
-
-function renderKPIsAhorro(){
-  const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
+function renderSuspensiones(){
+  const total=datosSuspensiones.reduce((a,b)=>a+(b.AHORRO||0),0);
   const proy=6000000000;
   const falt=Math.max(proy-total,0);
-  const meses=uniq(datos,'MES').length||1;
+  const meses=uniq(datosSuspensiones,'MES').length||1;
   const promMes=Math.round(total/meses);
   document.getElementById('acumuladoTotal').textContent=fmtMoney(total)+' · Acumulado';
   document.getElementById('kpiTotalActual').textContent=fmtMoney(total);
   document.getElementById('kpiFaltante').textContent=fmtMoney(falt);
   document.getElementById('kpiPromMes2').textContent=fmtMoney(promMes);
+  const ctx=document.getElementById('chartBarras');
+  if(charts['susp']){charts['susp'].destroy();}
+  const sectores=[...new Set(datosSuspensiones.map(d=>d.SECTOR))];
+  const valores=sectores.map(s=>datosSuspensiones.filter(x=>x.SECTOR===s).reduce((a,b)=>a+b.AHORRO,0));
+  charts['susp']=new Chart(ctx,{type:'bar',data:{labels:sectores,datasets:[{data:valores,backgroundColor:'rgba(242,140,0,0.9)',borderRadius:10,barThickness:30}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmtMoney(v)}}}}});
+  const tb=document.querySelector('#tablaResumen tbody');
+  tb.innerHTML=datosSuspensiones.map(d=>`<tr><td>${d.REGION}</td><td>${d.SECTOR}</td><td>${d.MES}</td><td>${d.CANT}</td><td>${fmtMoney(d.AHORRO)}</td></tr>`).join('');
+  document.getElementById('rowsCount').textContent=datosSuspensiones.length;
 }
 
 function renderRevision(){
-  if(charts['revBarPct']){charts['revBarPct'].destroy();charts['revBarPct']=null;}
-  const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
-  const valle=datos.filter(d=>d.REGION==='VALLE').reduce((a,b)=>a+(b.AHORRO||0),0);
-  const tolima=datos.filter(d=>d.REGION==='TOLIMA').reduce((a,b)=>a+(b.AHORRO||0),0);
-  const metaTotal=6000000000,metaValle=340000000,metaTolima=500000000;
-  const falt=Math.max(metaTotal-total,0);
-  const meses=uniq(datos,'MES').length||1;
+  const total=datosRevision.reduce((a,b)=>a+(b.AHORRO||0),0);
+  const valle=datosRevision.filter(d=>d.REGION==='VALLE').reduce((a,b)=>a+b.AHORRO,0);
+  const tolima=datosRevision.filter(d=>d.REGION==='TOLIMA').reduce((a,b)=>a+b.AHORRO,0);
+  const proy=6000000000;
+  const falt=Math.max(proy-total,0);
+  const meses=uniq(datosRevision,'MES').length||1;
   const promMes=Math.round(total/meses);
-  document.getElementById('revKpiProy').textContent=fmtMoney(metaTotal);
+  document.getElementById('revKpiProy').textContent=fmtMoney(proy);
   document.getElementById('revKpiActual').textContent=fmtMoney(total);
   document.getElementById('revKpiFaltante').textContent=fmtMoney(falt);
   document.getElementById('revKpiPromMes').textContent=fmtMoney(promMes);
-  charts['revBarPct']=new Chart(document.getElementById('revBarPct'),{
-    type:'bar',
-    data:{labels:['TOLIMA','VALLE'],datasets:[{data:[(tolima/metaTolima*100),(valle/metaValle*100)],backgroundColor:['#0ea5a5','#22c55e'],borderRadius:10,barThickness:28}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+' %'}}},
-      scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+' %'},grid:{color:'rgba(203,213,225,.4)'}},y:{grid:{display:false}}}}
-  });
+  if(charts['rev']){charts['rev'].destroy();}
+  charts['rev']=new Chart(document.getElementById('revBarPct'),{type:'bar',data:{labels:['TOLIMA','VALLE'],datasets:[{data:[(tolima/100000000)*100,(valle/100000000)*100],backgroundColor:['#0ea5a5','#22c55e'],borderRadius:8,barThickness:26}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+' %'}}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+' %'}},y:{grid:{display:false}}}}});
+  const tb=document.querySelector('#revTabla tbody');
+  tb.innerHTML=`<tr><td>TOLIMA</td><td>${fmtMoney(tolima)}</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>VALLE</td><td>${fmtMoney(valle)}</td><td></td><td></td><td></td><td></td><td></td></tr>`;
+  document.getElementById('lastUpdated').textContent='Actualizado: '+(new Date()).toLocaleString();
 }
 
-function init(){
-  document.getElementById('lastUpdated').textContent='Actualizado: '+(new Date()).toLocaleString();
-  poblarFiltrosIniciales();
-  document.getElementById('filterRegion').addEventListener('change',e=>{actualizarSectores(e.target.value);actualizarMeses(e.target.value);render();});
-  document.getElementById('filterSector').addEventListener('change',render);
-  document.getElementById('filterMes').addEventListener('change',render);
-  document.getElementById('btnReset').addEventListener('click',()=>{document.getElementById('filterRegion').value='ALL';actualizarSectores('ALL');actualizarMeses('ALL');render();});
-  render();renderRevision();
-}
-window.addEventListener('DOMContentLoaded',init);
+window.addEventListener('DOMContentLoaded',()=>{renderSuspensiones();});
 </script>
 </body>
 </html>
