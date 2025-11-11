@@ -66,8 +66,8 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
 </header>
 
 <div class="tabs">
-  <button class="tabbtn active" data-tab="page1">Info_Suspensiones</button>
-  <button class="tabbtn" data-tab="page2">Info_Cobro_Revision</button>
+  <button class="tabbtn active" data-tab="page1">Suspensiones</button>
+  <button class="tabbtn" data-tab="page2">Revision</button>
 </div>
 
 <section id="page1" class="page active">
@@ -164,11 +164,17 @@ const datos=[
   {REGION:'TOLIMA',SECTOR:'Zona Sur',MES:'junio',CANT:130,AHORRO:13000000},
   {REGION:'TOLIMA',SECTOR:'Zona Oriente',MES:'julio',CANT:180,AHORRO:6000000},
 ];
+
 const MESES_ORD=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const fmtMoney=n=>'$ '+Number(n||0).toLocaleString('es-CO');
 const uniq=(arr,key)=>[...new Set(arr.map(x=>x[key]).filter(Boolean))];
 const cap=s=>(s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
 let charts={};
+
+// === LOCALSTORAGE ===
+const KEY_PROY='valorProyectado';
+function getValorProyectado(){return Number(localStorage.getItem(KEY_PROY))||840000000;}
+function setValorProyectado(v){localStorage.setItem(KEY_PROY,v);}
 
 document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click',()=>{
@@ -219,7 +225,6 @@ function render(){
   renderKPIsAhorro();
 }
 
-// ✅ FIX — Sin bucle de crecimiento
 function renderBars(id,list,region){
   if(charts[id]){charts[id].destroy();charts[id]=null;}
   const canvas=document.getElementById(id);
@@ -239,7 +244,7 @@ function renderBars(id,list,region){
 
 function renderKPIsAhorro(){
   const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
-  const proy=Number(document.getElementById('inputValorProy').value)||0;
+  const proy=getValorProyectado();
   const falt=Math.max(proy-total,0);
   const meses=uniq(datos,'MES').length||1;
   const promMes=Math.round(total/meses);
@@ -248,14 +253,19 @@ function renderKPIsAhorro(){
   document.getElementById('kpiFaltante').textContent=fmtMoney(falt);
   document.getElementById('kpiPromMes2').textContent=fmtMoney(promMes);
 }
-document.getElementById('inputValorProy').addEventListener('input',renderKPIsAhorro);
+
+document.getElementById('inputValorProy').addEventListener('input',e=>{
+  const val=Number(e.target.value)||0;
+  setValorProyectado(val);
+  renderKPIsAhorro();
+});
 
 function renderRevision(){
   if(charts['revBarPct']){charts['revBarPct'].destroy();charts['revBarPct']=null;}
   const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
   const valle=datos.filter(d=>d.REGION==='VALLE').reduce((a,b)=>a+(b.AHORRO||0),0);
   const tolima=datos.filter(d=>d.REGION==='TOLIMA').reduce((a,b)=>a+(b.AHORRO||0),0);
-  const metaTotal=840000000,metaValle=340000000,metaTolima=500000000;
+  const metaTotal=getValorProyectado(),metaValle=340000000,metaTolima=500000000;
   const falt=Math.max(metaTotal-total,0);
   const meses=uniq(datos,'MES').length||1;
   const promMes=Math.round(total/meses);
@@ -270,18 +280,11 @@ function renderRevision(){
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+' %'}}},
       scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+' %'},grid:{color:'rgba(203,213,225,.4)'}},y:{grid:{display:false}}}}
   });
-  const mesesRef=['febrero','marzo','abril','mayo','junio','julio'];
-  const mat={VALLE:{},TOLIMA:{}};mesesRef.forEach(m=>{mat.VALLE[m]=0;mat.TOLIMA[m]=0;});
-  datos.forEach(d=>{const m=d.MES.toLowerCase();if(mesesRef.includes(m)){mat[d.REGION][m]=(mat[d.REGION][m]||0)+(d.AHORRO||0);}});
-  const tb=document.querySelector('#revTabla tbody');const tf=document.querySelector('#revTabla tfoot');
-  const fmt=v=>v?'$ '+Math.round(v/1_000_000)+' mill.':'$ 0 mill.';
-  tb.innerHTML=`<tr><td>TOLIMA</td>${mesesRef.map(m=>`<td>${fmt(mat.TOLIMA[m])}</td>`).join('')}</tr><tr><td>VALLE</td>${mesesRef.map(m=>`<td>${fmt(mat.VALLE[m])}</td>`).join('')}</tr>`;
-  const totales=mesesRef.map(m=>(mat.TOLIMA[m]||0)+(mat.VALLE[m]||0));
-  tf.innerHTML=`<tr><td><strong>Total</strong></td>${totales.map(v=>`<td><strong>${fmt(v)}</strong></td>`).join('')}</tr>`;
 }
 
 function init(){
   document.getElementById('lastUpdated').textContent='Actualizado: '+(new Date()).toLocaleString();
+  document.getElementById('inputValorProy').value=getValorProyectado();
   poblarFiltrosIniciales();
   document.getElementById('filterRegion').addEventListener('change',e=>{actualizarSectores(e.target.value);actualizarMeses(e.target.value);render();});
   document.getElementById('filterSector').addEventListener('change',render);
