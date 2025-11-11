@@ -5,10 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reimaginar_CE — Suspensiones & Revisión</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- =======================================================
+ 🧭 SECCIÓN: ESTILOS GLOBALES Y DISEÑO GERENCIAL
+======================================================= -->
 <style>
 :root{
   --bg:#f4f7f9; --card:#fff; --muted:#6b7280; --ink:#0f172a;
-  --accent:#F28C00; --success:#10b981; --danger:#ef4444;
+  --accent:#F28C00; --success:#22c55e; --info:#0ea5a5;
   --shadow:0 6px 18px rgba(16,24,40,.08); --radius:12px;
   font-family:"Inter", system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
 }
@@ -31,7 +35,7 @@ header .right{margin-left:auto;text-align:right}
 .sidebar{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);height:calc(100vh - 180px);overflow:auto}
 .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
 label{font-size:13px;color:var(--muted);font-weight:500}
-select,button,input{padding:9px 10px;border-radius:8px;border:1px solid #e6eef0;font-size:13px;width:100%}
+select,button{padding:9px 10px;border-radius:8px;border:1px solid #e6eef0;font-size:13px;width:100%}
 button{cursor:pointer;background:var(--accent);color:#fff;font-weight:600;border:none}
 button:hover{opacity:.9}
 
@@ -47,12 +51,17 @@ th{color:#6b7280;font-weight:600}
 .kpi-label{color:#6b7280;font-size:13px}
 .kpi-value{font-weight:700;font-size:15px;color:#0f172a}
 .kpi-green .kpi-value{color:var(--success)}
+.kpi-blue .kpi-value{color:var(--info)}
 .kpi-gray .kpi-value{color:#475569}
 footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
 @media(max-width:1200px){.layout{grid-template-columns:1fr}.row-main{flex-direction:column}}
 </style>
 </head>
 <body>
+
+<!-- =======================================================
+ 🏢 SECCIÓN: ENCABEZADO GLOBAL
+======================================================= -->
 <header>
   <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia">
   <div>
@@ -60,18 +69,25 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
     <p>Monitoreo de Suspensiones y Cobros de Revisión</p>
   </div>
   <div class="right">
-    <div class="pill" id="acumuladoTotal">$ 0 mill. · Acumulado</div>
+    <div class="pill" id="acumuladoTotal">$ 0 · Acumulado</div>
     <small id="lastUpdated" style="display:block;color:#6b7280;font-size:12px;margin-top:6px;">Actualizado: --</small>
   </div>
 </header>
 
+<!-- =======================================================
+ 🧩 SECCIÓN: PESTAÑAS PRINCIPALES
+======================================================= -->
 <div class="tabs">
-  <button class="tabbtn active" data-tab="page1">Suspensiones</button>
-  <button class="tabbtn" data-tab="page2">Revision</button>
+  <button class="tabbtn active" data-tab="page1">Info_Suspensiones</button>
+  <button class="tabbtn" data-tab="page2">Info_Cobro_Revision</button>
 </div>
 
+<!-- =======================================================
+ 📊 SECCIÓN: INFO_SUSPENSIONES
+======================================================= -->
 <section id="page1" class="page active">
   <div class="layout">
+    <!-- Panel lateral izquierdo -->
     <aside class="sidebar">
       <div class="card">
         <h3 style="margin-top:0;color:#0f172a;font-weight:700">Resumen Ahorro</h3>
@@ -85,11 +101,9 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
           <div class="toolbar" style="margin-top:10px"><button id="btnReset">Limpiar filtros</button></div>
         </div>
 
+        <!-- KPIs -->
         <div style="margin-top:18px;border-top:1px solid #e5e7eb;padding-top:14px;display:grid;gap:12px">
-          <div class="kpi-box">
-            <span class="kpi-label">Valor proyectado</span>
-            <input type="number" id="inputValorProy" value="840000000" min="0" step="1000000" style="width:120px;text-align:right;font-weight:700;color:#0f172a;border:1px solid #e5e7eb;border-radius:6px;padding:4px 6px;">
-          </div>
+          <div class="kpi-box"><span class="kpi-label">Valor proyectado</span><span id="valorProyectado" class="kpi-value">$ 6,000,000,000</span></div>
           <div class="kpi-box kpi-green"><span class="kpi-label">Total actual</span><span id="kpiTotalActual" class="kpi-value">$ 0</span></div>
           <div class="kpi-box kpi-gray"><span class="kpi-label">Faltante</span><span id="kpiFaltante" class="kpi-value">$ 0</span></div>
           <div class="kpi-box"><span class="kpi-label">Promedio por mes</span><span id="kpiPromMes2" class="kpi-value">$ 0</span></div>
@@ -97,6 +111,7 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
       </div>
     </aside>
 
+    <!-- Contenido principal -->
     <main>
       <section id="panelGlobal">
         <div class="row-main">
@@ -121,14 +136,19 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
   </div>
 </section>
 
+<!-- =======================================================
+ 💰 SECCIÓN: INFO_COBRO_REVISION
+======================================================= -->
 <section id="page2" class="page">
   <div class="layout" style="grid-template-columns:1fr">
-    <div class="card" style="text-align:center;background:#fff5ec;border-left:5px solid var(--accent);font-weight:700;">INFORMACIÓN PROYECTO REIMAGINAR_CE — COBRO DE REVISIÓN EN CAMBIOS DE MEDIDOR</div>
+    <div class="card" style="text-align:center;background:#fff5ec;border-left:5px solid var(--accent);font-weight:700;">
+      INFORMACIÓN PROYECTO REIMAGINAR_CE — COBRO DE REVISIÓN EN CAMBIOS DE MEDIDOR
+    </div>
     <div class="row-main" style="margin-top:10px;flex-direction:column;gap:20px;">
       <div class="row-main" style="gap:18px">
         <div class="card" style="flex:1">
           <h4 style="margin:4px 0 8px 0;color:#0f172a">KPIs Principales</h4>
-          <div class="kpi-box"><span class="kpi-label">Valor proyectado</span><span id="revKpiProy" class="kpi-value">$ 0</span></div>
+          <div class="kpi-box"><span class="kpi-label">Valor proyectado</span><span id="revKpiProy" class="kpi-value">$ 6,000,000,000</span></div>
           <div class="kpi-box kpi-green"><span class="kpi-label">Total actual</span><span id="revKpiActual" class="kpi-value">$ 0</span></div>
           <div class="kpi-box kpi-gray"><span class="kpi-label">Faltante</span><span id="revKpiFaltante" class="kpi-value">$ 0</span></div>
           <div class="kpi-box"><span class="kpi-label">Promedio por mes</span><span id="revKpiPromMes" class="kpi-value">$ 0</span></div>
@@ -151,8 +171,14 @@ footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
   </div>
 </section>
 
+<!-- =======================================================
+ ⚙️ SECCIÓN: PIE DE PÁGINA
+======================================================= -->
 <footer>© 2025 · Celsia · Tablero Reimaginar_CE · Visión Gerencial ⚡</footer>
 
+<!-- =======================================================
+ 🧠 SECCIÓN: SCRIPT PRINCIPAL (LÓGICA Y GRÁFICAS)
+======================================================= -->
 <script>
 const datos=[
   {REGION:'VALLE',SECTOR:'CENTRO',MES:'abril',CANT:200,AHORRO:15000000},
@@ -161,20 +187,14 @@ const datos=[
   {REGION:'VALLE',SECTOR:'SUR',MES:'junio',CANT:350,AHORRO:18000000},
   {REGION:'TOLIMA',SECTOR:'Zona Centro',MES:'abril',CANT:150,AHORRO:8000000},
   {REGION:'TOLIMA',SECTOR:'Zona Norte',MES:'mayo',CANT:200,AHORRO:11000000},
-  {REGION:'TOLIMA',SECTOR:'Zona Sur',MES:'junio',CANT:130,AHORRO:13000000},
+  {REGION:'TOLIMA',SECTOR:'Zona Sur',MES:'junio',CANT:250,AHORRO:13000000},
   {REGION:'TOLIMA',SECTOR:'Zona Oriente',MES:'julio',CANT:180,AHORRO:6000000},
 ];
-
 const MESES_ORD=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const fmtMoney=n=>'$ '+Number(n||0).toLocaleString('es-CO');
 const uniq=(arr,key)=>[...new Set(arr.map(x=>x[key]).filter(Boolean))];
 const cap=s=>(s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
 let charts={};
-
-// === LOCALSTORAGE ===
-const KEY_PROY='valorProyectado';
-function getValorProyectado(){return Number(localStorage.getItem(KEY_PROY))||840000000;}
-function setValorProyectado(v){localStorage.setItem(KEY_PROY,v);}
 
 document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click',()=>{
@@ -228,23 +248,22 @@ function render(){
 function renderBars(id,list,region){
   if(charts[id]){charts[id].destroy();charts[id]=null;}
   const canvas=document.getElementById(id);
-  canvas.style.height='340px';canvas.style.width='100%';
   const sectRef=region?sectoresPorRegion(region):uniq(list,'SECTOR');
   const byS={};sectRef.forEach(s=>byS[s]=0);
   list.forEach(r=>{byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0);});
   const labels=Object.keys(byS);const values=labels.map(l=>byS[l]);
-  requestAnimationFrame(()=>{charts[id]=new Chart(canvas,{
+  charts[id]=new Chart(canvas,{
     type:'bar',
     data:{labels,datasets:[{data:values,backgroundColor:'rgba(242,140,0,0.85)',borderColor:'rgba(242,140,0,1)',borderWidth:1.2,borderRadius:10,barThickness:30}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:700,easing:'easeOutQuart'},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600,easing:'easeOutQuart'},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}},
       scales:{y:{beginAtZero:true,grid:{color:'rgba(148,163,184,.15)'},ticks:{callback:v=>fmtMoney(v)}}}}
-  });});
+  });
 }
 
 function renderKPIsAhorro(){
   const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
-  const proy=getValorProyectado();
+  const proy=6000000000;
   const falt=Math.max(proy-total,0);
   const meses=uniq(datos,'MES').length||1;
   const promMes=Math.round(total/meses);
@@ -254,18 +273,12 @@ function renderKPIsAhorro(){
   document.getElementById('kpiPromMes2').textContent=fmtMoney(promMes);
 }
 
-document.getElementById('inputValorProy').addEventListener('input',e=>{
-  const val=Number(e.target.value)||0;
-  setValorProyectado(val);
-  renderKPIsAhorro();
-});
-
 function renderRevision(){
   if(charts['revBarPct']){charts['revBarPct'].destroy();charts['revBarPct']=null;}
   const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
   const valle=datos.filter(d=>d.REGION==='VALLE').reduce((a,b)=>a+(b.AHORRO||0),0);
   const tolima=datos.filter(d=>d.REGION==='TOLIMA').reduce((a,b)=>a+(b.AHORRO||0),0);
-  const metaTotal=getValorProyectado(),metaValle=340000000,metaTolima=500000000;
+  const metaTotal=6000000000,metaValle=340000000,metaTolima=500000000;
   const falt=Math.max(metaTotal-total,0);
   const meses=uniq(datos,'MES').length||1;
   const promMes=Math.round(total/meses);
@@ -284,7 +297,6 @@ function renderRevision(){
 
 function init(){
   document.getElementById('lastUpdated').textContent='Actualizado: '+(new Date()).toLocaleString();
-  document.getElementById('inputValorProy').value=getValorProyectado();
   poblarFiltrosIniciales();
   document.getElementById('filterRegion').addEventListener('change',e=>{actualizarSectores(e.target.value);actualizarMeses(e.target.value);render();});
   document.getElementById('filterSector').addEventListener('change',render);
