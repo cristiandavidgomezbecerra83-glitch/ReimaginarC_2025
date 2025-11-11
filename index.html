@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reimaginar_C — Suspensiones & Revisión</title>
+<title>Reimaginar_CE — Suspensiones & Revisión</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root{
@@ -28,11 +28,10 @@
   .pill{
     background:var(--naranja);color:#fff;display:inline-block;
     padding:10px 16px;border-radius:999px;
-    font-size:.95em;font-weight:600;
+    font-size:.9em;font-weight:600;
     box-shadow:0 4px 10px rgba(242,140,0,.35);
   }
 
-  /* pestañas */
   .tabs{
     display:flex;gap:8px;padding:10px 20px;
     border-bottom:1px solid #e5e7eb;background:#fff;
@@ -49,9 +48,9 @@
     box-shadow:0 2px 6px rgba(15,23,42,.25);
   }
 
-  /* layout */
   .page{display:none}
   .page.active{display:block}
+
   .layout{
     display:grid;grid-template-columns:360px 1fr;
     gap:18px;padding:18px;
@@ -92,24 +91,17 @@
   th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
   th{color:#6b7280;font-weight:600}
 
-  /* barras hoja 1 */
-.chart-bar-wrap{
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:stretch;
-  height:360px; /* altura total del contenedor */
-}
-
-.chart-bar-wrap canvas{
-  width:100% !important;
-  height:100% !important; /* ocupará el alto exacto del contenedor */
-  max-height:360px !important; /* nunca crecerá más */
-}
-
+  .chart-bar-wrap{
+    display:flex;flex-direction:column;
+    justify-content:flex-start;align-items:stretch;
+    height:360px; /* altura fija contenedor */
+  }
+  .chart-bar-wrap canvas{
+    width:100% !important;
+    height:100% !important;   /* ocupa contenedor */
+    max-height:360px !important; /* no crece más */
   }
 
-  /* KPI boxes hoja 1 */
   .kpi-box{
     display:flex;justify-content:space-between;align-items:center;
     padding:8px 10px;margin-top:4px;
@@ -121,7 +113,7 @@
   .kpi-label{font-size:12px;color:#6b7280}
   .kpi-value{font-size:14px;font-weight:700;color:#0f172a}
 
-  /* hoja 2 (revisión) original + ajuste tamaño graf */
+  /* Hoja 2 original */
   .rev-head{
     background:#a95020;color:#fff;text-align:center;
     padding:10px;border-radius:8px;font-weight:700;letter-spacing:.3px
@@ -146,7 +138,7 @@
   .rev-card h4{margin:4px 0 10px 0}
   .hbar canvas{
     width:100% !important;
-    height:240px !important; /* AJUSTE: tamaño estable */
+    height:240px !important; /* altura estable */
   }
   .cfg{display:flex;gap:8px;flex-wrap:wrap}
   .cfg input{width:160px}
@@ -159,6 +151,7 @@
     .layout{grid-template-columns:1fr}
     .rev-grid{grid-template-columns:1fr}
     .sidebar{height:auto}
+    .row-main{flex-direction:column}
   }
 </style>
 </head>
@@ -171,23 +164,23 @@
   </div>
   <div class="right">
     <div class="pill" id="acumuladoTotal">$ 0 · ACUMULADO</div>
-    <small id="lastUpdated" style="display:block;color:#6b7280;font-size:12px;margin-top:6px;">Última carga: --</small>
+    <small id="lastUpdated">Última carga: --</small>
   </div>
 </header>
 
 <div class="tabs">
-  <button class="tabbtn active" data-tab="page1">Cobro Suspensiones</button>
-  <button class="tabbtn" data-tab="page2">Cobro Revision</button>
+  <button class="tabbtn active" data-tab="page1">Info_Suspensiones</button>
+  <button class="tabbtn" data-tab="page2">Info_Cobro_Revision</button>
 </div>
 
-<!-- HOJA 1: SUSPENSIONES -->
+<!-- ========== HOJA 1: SUSPENSIONES ========== -->
 <section id="page1" class="page active">
   <div class="layout">
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="card">
-        <!-- Total ahorro principal -->
-        <div class="kpi" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <!-- Total -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <div>
             <div id="acumuladoLarge" style="font-size:20px;font-weight:700;color:#0f172a">$ 0</div>
             <small style="color:#6b7280">Total Ahorro (COP)</small>
@@ -196,25 +189,31 @@
 
         <!-- Filtros -->
         <div style="height:12px"></div>
-        <div class="filters">
+        <div>
           <div>
             <label>Región</label>
-            <select id="filterRegion"><option value="ALL">Todos</option></select>
+            <select id="filterRegion">
+              <option value="ALL">Todos</option>
+            </select>
           </div>
           <div>
             <label>Sector / Zona</label>
-            <select id="filterSector" disabled><option value="ALL">Todos</option></select>
+            <select id="filterSector" disabled>
+              <option value="ALL">Todos</option>
+            </select>
           </div>
           <div>
             <label>Mes</label>
-            <select id="filterMes"><option value="ALL">Todos</option></select>
+            <select id="filterMes">
+              <option value="ALL">Todos</option>
+            </select>
           </div>
           <div style="margin-top:8px">
             <button id="btnReset">Limpiar filtros</button>
           </div>
         </div>
 
-        <!-- KPIs Gerenciales -->
+        <!-- KPIs (globales) -->
         <div style="margin-top:16px;border-top:1px solid #e5e7eb;padding-top:10px">
           <div class="kpi-box">
             <div class="kpi-label">Valor proyectado</div>
@@ -238,9 +237,9 @@
 
     <!-- Main -->
     <main>
+      <!-- Vista única (cuando se filtra por región específica) -->
       <section id="panelGlobal">
         <div class="row-main">
-          <!-- Tabla -->
           <div class="table-wrap">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
               <h3 style="margin:0;color:#0f172a">Tabla resumen</h3>
@@ -257,10 +256,62 @@
               </table>
             </div>
           </div>
-          <!-- Gráfica -->
           <div class="chart-bar-wrap">
             <h3 style="margin:6px 6px 10px 6px;color:#0f172a;font-size:15px">Ahorro por sector</h3>
             <canvas id="chartBarras"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Vista dividida VALLE / TOLIMA cuando Región = ALL -->
+      <section id="panelSplit" style="display:none">
+        <!-- VALLE -->
+        <div class="card" style="margin-bottom:8px"><strong>VALLE</strong></div>
+        <div class="row-main" style="margin-bottom:18px">
+          <div class="table-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <h3 style="margin:0;color:#0f172a">Tabla VALLE</h3>
+              <small style="color:#6b7280"><span id="rowsCountV">0</span> filas</small>
+            </div>
+            <div class="table-scroll">
+              <table id="tablaResumenV">
+                <thead>
+                  <tr>
+                    <th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="chart-bar-wrap">
+            <h3 style="margin:6px 6px 10px 6px;color:#0f172a;font-size:15px">Ahorro por sector — VALLE</h3>
+            <canvas id="chartBarrasV"></canvas>
+          </div>
+        </div>
+
+        <!-- TOLIMA -->
+        <div class="card" style="margin-bottom:8px"><strong>TOLIMA</strong></div>
+        <div class="row-main">
+          <div class="table-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <h3 style="margin:0;color:#0f172a">Tabla TOLIMA</h3>
+              <small style="color:#6b7280"><span id="rowsCountT">0</span> filas</small>
+            </div>
+            <div class="table-scroll">
+              <table id="tablaResumenT">
+                <thead>
+                  <tr>
+                    <th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="chart-bar-wrap">
+            <h3 style="margin:6px 6px 10px 6px;color:#0f172a;font-size:15px">Ahorro por sector — TOLIMA</h3>
+            <canvas id="chartBarrasT"></canvas>
           </div>
         </div>
       </section>
@@ -268,7 +319,7 @@
   </div>
 </section>
 
-<!-- HOJA 2: COBRO DE REVISIÓN (código original con ajuste de alto en gráfica) -->
+<!-- ========== HOJA 2: COBRO DE REVISIÓN (original, solo ajustando alto gráfica) ========== -->
 <section id="page2" class="page">
   <div class="layout" style="grid-template-columns:1fr">
     <div class="rev-head">
@@ -321,7 +372,8 @@
               <thead>
                 <tr>
                   <th>DEPARTAMENTO</th>
-                  <th>Febrero</th><th>Marzo</th><th>Abril</th><th>Mayo</th><th>Junio</th><th>Julio</th>
+                  <th>Febrero</th><th>Marzo</th><th>Abril</th>
+                  <th>Mayo</th><th>Junio</th><th>Julio</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -337,7 +389,7 @@
 <footer>Creado para Celsia · Datos insertados · AHORRO</footer>
 
 <script>
-/* ========= DATOS BASE (QUEMADOS) ========= */
+/* ========= DATOS BASE ========= */
 const datos = [
   { REGION:'VALLE',  SECTOR:'CENTRO',       MES:'abril', CANT:200, AHORRO:15000000 },
   { REGION:'VALLE',  SECTOR:'NORTE',        MES:'abril', CANT:300, AHORRO:18000000 },
@@ -349,7 +401,6 @@ const datos = [
   { REGION:'TOLIMA', SECTOR:'Zona Oriente', MES:'julio', CANT:180, AHORRO: 6000000 },
 ];
 
-/* ============== HELPERS ============== */
 const MESES_ORD = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const fmtMoney = n => '$ ' + Number(n||0).toLocaleString('es-CO');
 const fmtMill  = n => `${Math.round((n||0)/1_000_000)} mill.`;
@@ -357,20 +408,21 @@ const uniq = (arr,key) => [...new Set(arr.map(x=>x[key]).filter(Boolean))];
 const cap = s => (s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
 const VALOR_PROY = 6000000000;
 let charts = {};
+let chartRevPct;
 
-/* ========= pestañas ========= */
+/* ========= Pestañas ========= */
 document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
-    if(btn.dataset.tab==='page1'){ renderSuspensiones(); }
-    else { renderRevision(); }
+    if(btn.dataset.tab==='page1') renderSuspensiones();
+    else renderRevision();
   });
 });
 
-/* ========= HOJA 1 (suspensiones) ========= */
+/* ========= HOJA 1 ========= */
 function sectoresPorRegion(region){
   return region==='VALLE'
     ? ['CENTRO','NORTE','PACIFICO','SUR']
@@ -383,16 +435,18 @@ function poblarFiltrosIniciales(){
     const o=document.createElement('option');
     o.value=r;o.textContent=r;regSel.appendChild(o);
   });
-  actualizarMeses('ALL'); actualizarSectores('ALL');
+  actualizarMeses('ALL');
+  actualizarSectores('ALL');
 }
 
 function actualizarSectores(region){
   const sel = document.getElementById('filterSector');
-  const disabled = (region==='ALL'); sel.disabled = disabled;
+  const disabled = (region==='ALL');
+  sel.disabled = disabled;
   let ops = [];
   if(region==='VALLE') ops = ['CENTRO','NORTE','PACIFICO','SUR'];
   if(region==='TOLIMA') ops = ['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
-  sel.innerHTML='<option value="ALL">Todos</option>'+ops.map(s=>`<option>${s}</option>`).join('');
+  sel.innerHTML='<option value="ALL">Todos</option>'+ops.map(s=>`<option value="${s}">${s}</option>`).join('');
   sel.value='ALL';
 }
 
@@ -401,8 +455,8 @@ function actualizarMeses(region){
   let fuente = datos;
   if(region!=='ALL') fuente = datos.filter(d=>d.REGION===region);
   const meses = uniq(fuente,'MES').sort((a,b)=>MESES_ORD.indexOf(a)-MESES_ORD.indexOf(b));
-  mesSel.innerHTML = '<option value="ALL">Todos</option>'+meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
-  mesSel.value = 'ALL';
+  mesSel.innerHTML='<option value="ALL">Todos</option>'+meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
+  mesSel.value='ALL';
 }
 
 function filtrarBase(region){
@@ -416,51 +470,80 @@ function filtrarBase(region){
   });
 }
 
-function renderSuspensiones(){
-  const region = document.getElementById('filterRegion').value;
-  const list = filtrarBase(region);
-
-  // KPIs globales (no por filtro)
+function renderKPIsGlobal(){
   const totalAll = datos.reduce((a,b)=>a+(b.AHORRO||0),0);
   const mesesAll = uniq(datos,'MES').length || 1;
+
   document.getElementById('acumuladoTotal').textContent = fmtMoney(totalAll)+' · ACUMULADO';
   document.getElementById('acumuladoLarge').textContent = fmtMoney(totalAll);
   document.getElementById('kpiProy').textContent = fmtMoney(VALOR_PROY);
   document.getElementById('kpiTotalActual').textContent = fmtMoney(totalAll);
   document.getElementById('kpiFaltante').textContent = fmtMoney(Math.max(VALOR_PROY-totalAll,0));
   document.getElementById('kpiPromMes').textContent = fmtMoney(Math.round(totalAll/mesesAll));
+}
 
-  // Tabla según filtros
-  const tbody = document.querySelector('#tablaResumen tbody');
+function renderSuspensiones(){
+  renderKPIsGlobal();
+
+  const region = document.getElementById('filterRegion').value;
+  const base = filtrarBase(region);
+
+  if(region==='ALL'){
+    // Mostrar split VALLE / TOLIMA
+    document.getElementById('panelGlobal').style.display='none';
+    document.getElementById('panelSplit').style.display='block';
+
+    const valle = base.filter(d=>d.REGION==='VALLE');
+    const tolima = base.filter(d=>d.REGION==='TOLIMA');
+
+    fillTablaSimple('#tablaResumenV tbody','rowsCountV',valle,false);
+    fillTablaSimple('#tablaResumenT tbody','rowsCountT',tolima,false);
+
+    renderBars('chartBarrasV', valle, 'VALLE');
+    renderBars('chartBarrasT', tolima, 'TOLIMA');
+  }else{
+    // Vista única para una región
+    document.getElementById('panelGlobal').style.display='block';
+    document.getElementById('panelSplit').style.display='none';
+
+    fillTablaSimple('#tablaResumen tbody','rowsCount',base,true);
+    renderBars('chartBarras', base, region);
+  }
+}
+
+function fillTablaSimple(tbodySel,countId,list,showRegion){
+  const tbody = document.querySelector(tbodySel);
   tbody.innerHTML = list.map(r=>`
     <tr>
-      <td>${r.REGION}</td>
+      ${showRegion?`<td>${r.REGION}</td>`:''}
       <td>${r.SECTOR}</td>
       <td>${cap(r.MES)}</td>
       <td>${r.CANT}</td>
       <td>${fmtMoney(r.AHORRO)}</td>
-    </tr>`).join('');
-  document.getElementById('rowsCount').textContent = list.length;
-
-  // Gráfica (por sector dentro del filtro)
-  renderBarsSusp('chartBarras', list);
+    </tr>
+  `).join('');
+  const c = document.getElementById(countId);
+  if(c) c.textContent = list.length;
 }
 
-function renderBarsSusp(id, list){
+function renderBars(id,list,region){
   if(charts[id]){ charts[id].destroy(); charts[id]=null; }
   const canvas = document.getElementById(id);
+  if(!canvas) return;
 
-  const bySector = {};
-  list.forEach(r=>{
-    bySector[r.SECTOR] = (bySector[r.SECTOR]||0) + (r.AHORRO||0);
-  });
-  const labels = Object.keys(bySector);
-  const values = labels.map(l=>bySector[l]);
-
-  if(labels.length===0){
-    canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  if(!list || list.length===0){
+    const ctx = canvas.getContext('2d');
+    ctx && ctx.clearRect(0,0,canvas.width,canvas.height);
     return;
   }
+
+  // Si no hay sector filtrado específico, agregamos por sector
+  const byS = {};
+  list.forEach(r=>{
+    byS[r.SECTOR] = (byS[r.SECTOR]||0) + (r.AHORRO||0);
+  });
+  const labels = Object.keys(byS);
+  const values = labels.map(l=>byS[l]);
 
   charts[id] = new Chart(canvas,{
     type:'bar',
@@ -468,11 +551,11 @@ function renderBarsSusp(id, list){
       labels,
       datasets:[{
         data:values,
-        backgroundColor:'rgba(242,140,0,0.9)',
+        backgroundColor:'rgba(242,140,0,0.90)',
         borderColor:'rgba(242,140,0,1)',
         borderWidth:1,
         borderRadius:8,
-        barThickness:28
+        barThickness:26
       }]
     },
     options:{
@@ -486,7 +569,7 @@ function renderBarsSusp(id, list){
         x:{grid:{display:false}},
         y:{
           beginAtZero:true,
-          grid:{color:'rgba(148,163,184,0.16)'},
+          grid:{color:'rgba(148,163,184,.14)'},
           ticks:{callback:v=>fmtMoney(v)}
         }
       }
@@ -494,8 +577,7 @@ function renderBarsSusp(id, list){
   });
 }
 
-/* ========= HOJA 2 (revisión) - ORIGINAL + AJUSTE ALTO GRAF ========= */
-let chartRevPct;
+/* ========= HOJA 2 (Revisión) ========= */
 const stateRev = {
   metaTotal: 840000000,
   metaValle: 340000000,
@@ -513,12 +595,12 @@ function computeMonthlyMatrix(){
   const mat = {VALLE:{},TOLIMA:{}};
   meses.forEach(m=>{mat.VALLE[m]=0; mat.TOLIMA[m]=0;});
   datos.forEach(d=>{
-    const m = d.MES.toLowerCase();
+    const m=d.MES.toLowerCase();
     if(meses.includes(m)){
-      mat[d.REGION][m] = (mat[d.REGION][m]||0) + (d.AHORRO||0);
+      mat[d.REGION][m]=(mat[d.REGION][m]||0)+(d.AHORRO||0);
     }
   });
-  return {meses, mat};
+  return {meses,mat};
 }
 
 function renderRevisionKPIs(){
@@ -528,14 +610,14 @@ function renderRevisionKPIs(){
 
   document.getElementById('revKpiProy').textContent = fmtMill(stateRev.metaTotal);
   document.getElementById('revKpiActual').textContent = fmtMill(TOTAL);
-  document.getElementById('revKpiFaltante').textContent = fmtMill(Math.max(stateRev.metaTotal - TOTAL,0));
+  document.getElementById('revKpiFaltante').textContent = fmtMill(Math.max(stateRev.metaTotal-TOTAL,0));
   document.getElementById('revKpiPromMes').textContent = fmtMill(promMes);
 }
 
 function renderRevisionBars(){
   const {VALLE,TOLIMA} = computeByRegion();
-  const pValle  = stateRev.metaValle ? Math.min(100, (VALLE/stateRev.metaValle)*100) : 0;
-  const pTolima = stateRev.metaTolima? Math.min(100, (TOLIMA/stateRev.metaTolima)*100): 0;
+  const pValle  = stateRev.metaValle  ? Math.min(100,(VALLE/stateRev.metaValle)*100)   : 0;
+  const pTolima = stateRev.metaTolima ? Math.min(100,(TOLIMA/stateRev.metaTolima)*100) : 0;
 
   if(chartRevPct){ chartRevPct.destroy(); chartRevPct=null; }
 
@@ -547,7 +629,7 @@ function renderRevisionBars(){
         data:[pTolima,pValle],
         backgroundColor:['#0ea5a5','#22c55e'],
         borderRadius:8,
-        barThickness:26
+        barThickness:24
       }]
     },
     options:{
@@ -575,14 +657,14 @@ function renderRevisionTable(){
   const {meses,mat} = computeMonthlyMatrix();
   const tb = document.querySelector('#revTabla tbody');
   const tf = document.querySelector('#revTabla tfoot');
-  const fmtCell = v => v ? '$ ' + Math.round(v).toLocaleString('es-CO') : '$ 0';
+  const fmtCell = v => v ? '$ ' + Math.round(v/1).toLocaleString('es-CO') : '$ 0';
 
   const rowTolima = `<tr><td>TOLIMA</td>${meses.map(m=>`<td>${fmtCell(mat.TOLIMA[m])}</td>`).join('')}</tr>`;
   const rowValle  = `<tr><td>VALLE</td>${meses.map(m=>`<td>${fmtCell(mat.VALLE[m])}</td>`).join('')}</tr>`;
   tb.innerHTML = rowTolima + rowValle;
 
-  const totales = meses.map(m=> (mat.TOLIMA[m]||0) + (mat.VALLE[m]||0) );
-  tf.innerHTML = `<tr><td><strong>Total</strong></td>${totales.map(v=>`<td><strong>${fmtCell(v)}</strong></td>`).join('')}</tr>`;
+  const totales = meses.map(m=>(mat.TOLIMA[m]||0)+(mat.VALLE[m]||0));
+  tf.innerHTML=`<tr><td><strong>Total</strong></td>${totales.map(v=>`<td><strong>${fmtCell(v)}</strong></td>`).join('')}</tr>`;
 }
 
 function bindRevisionCfg(){
@@ -611,14 +693,14 @@ function init(){
 
   // Hoja 1
   poblarFiltrosIniciales();
-  document.getElementById('filterRegion').addEventListener('change', e=>{
+  document.getElementById('filterRegion').addEventListener('change',e=>{
     actualizarSectores(e.target.value);
     actualizarMeses(e.target.value);
     renderSuspensiones();
   });
-  document.getElementById('filterSector').addEventListener('change', renderSuspensiones);
-  document.getElementById('filterMes').addEventListener('change', renderSuspensiones);
-  document.getElementById('btnReset').addEventListener('click', ()=>{
+  document.getElementById('filterSector').addEventListener('change',renderSuspensiones);
+  document.getElementById('filterMes').addEventListener('change',renderSuspensiones);
+  document.getElementById('btnReset').addEventListener('click',()=>{
     document.getElementById('filterRegion').value='ALL';
     actualizarSectores('ALL');
     actualizarMeses('ALL');
@@ -635,5 +717,3 @@ window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
-
-
