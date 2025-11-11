@@ -6,197 +6,215 @@
 <title>Reimaginar_CE — Suspensiones & Revisión</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  :root{
-    --bg:#f4f7f9; --card:#fff; --muted:#6b7280; --ink:#0f172a;
-    --accent-1:#007a5a; --accent-2:#00a0d2; --naranja:#F28C00;
-    --shadow:0 6px 18px rgba(16,24,40,.08); --radius:12px; --gap:18px;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system,'Segoe UI',Roboto,Arial;
-  }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg) 0%, #eef6f5 100%);}
-  header{display:flex;align-items:center;gap:15px;padding:10px 20px;border-bottom:4px solid var(--naranja);background:#f5f5f5}
-  header img{height:75px}
-  header h2{margin:0;color:#333;font-weight:600}
-  header p{margin:0;color:#666;font-size:.85em}
-  header .right{margin-left:auto;text-align:right}
-  .pill{background:#2f2f2f;color:#d4ffb2;display:inline-block;padding:10px 16px;border-radius:10px;font-size:1.05em}
+:root{
+  --bg:#f4f7f9; --card:#fff; --muted:#6b7280; --ink:#0f172a;
+  --accent:#F28C00; --success:#10b981; --danger:#ef4444;
+  --shadow:0 6px 18px rgba(16,24,40,.08); --radius:12px;
+  font-family:"Inter", system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg) 0%, #eef6f5 100%);}
+header{display:flex;align-items:center;gap:15px;padding:10px 20px;border-bottom:4px solid var(--accent);background:#fff;box-shadow:var(--shadow);}
+header img{height:70px}
+header h2{margin:0;color:#0f172a;font-weight:700;font-size:22px}
+header p{margin:0;color:#6b7280;font-size:.9em}
+header .right{margin-left:auto;text-align:right}
+.pill{background:var(--accent);color:#fff;display:inline-block;padding:10px 18px;border-radius:24px;font-size:1em;font-weight:600;box-shadow:0 4px 10px rgba(242,140,0,.3)}
 
-  .tabs{display:flex;gap:8px;padding:10px 20px;border-bottom:1px solid #e5e7eb;background:#fff}
-  .tabbtn{padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;font-size:14px}
-  .tabbtn.active{background:#0f172a;color:#fff;border-color:#0f172a}
+.tabs{display:flex;gap:10px;padding:10px 20px;border-bottom:1px solid #e5e7eb;background:#fff}
+.tabbtn{padding:10px 16px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:#334155;transition:all .2s ease}
+.tabbtn:hover{background:#f9fafb}
+.tabbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-  .page{display:none}
-  .page.active{display:block}
-  .layout{display:grid;grid-template-columns:360px 1fr;gap:18px;padding:18px}
-  .sidebar{background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--shadow);height:calc(100vh - 160px);overflow:auto}
-  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
-  label{font-size:13px;color:var(--muted)}
-  select,button,input{padding:8px;border-radius:8px;border:1px solid #e6eef0}
-  .num{font-size:20px;font-weight:700}
-  .row-main{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-  .table-wrap,.chart-bar-wrap{background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow)}
-  .table-scroll{max-height:360px;overflow:auto}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
-  th{color:#6b7280;font-weight:600}
-  .chart-bar-wrap canvas{width:100% !important;height:360px !important}
+.page{display:none}
+.page.active{display:block}
+.layout{display:grid;grid-template-columns:370px 1fr;gap:20px;padding:20px}
+.sidebar{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);height:calc(100vh - 180px);overflow:auto}
+.card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+label{font-size:13px;color:var(--muted);font-weight:500}
+select,button,input{padding:9px 10px;border-radius:8px;border:1px solid #e6eef0;font-size:13px;width:100%}
+button{cursor:pointer;background:var(--accent);color:#fff;font-weight:600;border:none}
+button:hover{opacity:.9}
 
-  footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
-  @media (max-width:1200px){
-    .layout{grid-template-columns:1fr}
-  }
+.row-main{display:flex;gap:20px;align-items:stretch}
+.table-wrap,.chart-bar-wrap{flex:1;display:flex;flex-direction:column;background:#fff;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.table-scroll{flex:1;overflow:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px;border-bottom:1px solid #f2f6f7;text-align:left}
+th{color:#6b7280;font-weight:600}
+.chart-bar-wrap canvas{flex:1;width:100%!important;height:100%!important}
+
+.kpi-box{background:linear-gradient(135deg,#fff,#f9fafb);border-left:5px solid var(--accent);padding:10px 14px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow);}
+.kpi-label{color:#6b7280;font-size:13px}
+.kpi-value{font-weight:700;font-size:15px;color:#0f172a}
+.kpi-green .kpi-value{color:var(--success)}
+.kpi-gray .kpi-value{color:#475569}
+footer{padding:18px;color:#6b7280;font-size:13px;text-align:center}
+@media(max-width:1200px){.layout{grid-template-columns:1fr}.row-main{flex-direction:column}}
 </style>
 </head>
 <body>
-  <header>
-    <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia">
-    <div>
-      <h2>Reimaginar_CE — Tableros</h2>
-      <p>Empresa: Celsia · Campo económico: AHORRO</p>
-    </div>
-    <div class="right">
-      <div class="pill" id="acumuladoTotal">$ 0 mill.<br><small>ACUMULADO ACTUAL</small></div>
-      <small id="lastUpdated" style="display:block;color:#6b7280;font-size:12px;margin-top:6px;">Última carga: --</small>
-    </div>
-  </header>
-
-  <div class="tabs">
-    <button class="tabbtn active" data-tab="page1">Info_Suspensiones</button>
-    <button class="tabbtn" data-tab="page2">Info_Cobro_Revision</button>
+<header>
+  <img src="https://raw.githubusercontent.com/cristiandavidgomezbecerra83-glitch/ReimaginarC/main/logo-celsia.png" alt="Logo Celsia">
+  <div>
+    <h2>Reimaginar_CE — Tablero Gerencial</h2>
+    <p>Monitoreo de Suspensiones y Cobros de Revisión</p>
   </div>
+  <div class="right">
+    <div class="pill" id="acumuladoTotal">$ 0 mill. · Acumulado</div>
+    <small id="lastUpdated" style="display:block;color:#6b7280;font-size:12px;margin-top:6px;">Actualizado: --</small>
+  </div>
+</header>
 
-  <!-- ====== HOJA 1: SUSPENSIONES ====== -->
-  <section id="page1" class="page active">
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="card">
-          <h3 style="margin-top:0;color:#0f172a">Resumen Ahorro</h3>
-          <div style="margin-bottom:12px;color:#6b7280;font-size:13px">
-            <small>Monitoreo de suspensiones por región, sector y mes.</small>
+<div class="tabs">
+  <button class="tabbtn active" data-tab="page1">Info_Suspensiones</button>
+  <button class="tabbtn" data-tab="page2">Info_Cobro_Revision</button>
+</div>
+
+<!-- ====== HOJA 1: SUSPENSIONES ====== -->
+<section id="page1" class="page active">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="card">
+        <h3 style="margin-top:0;color:#0f172a;font-weight:700">Resumen Ahorro</h3>
+        <div style="margin-bottom:14px;color:#6b7280;font-size:13px">
+          <small>Monitoreo de suspensiones por región, sector y mes.</small>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+          <div><label>Región</label><select id="filterRegion"><option value="ALL">Todos</option></select></div>
+          <div><label>Sector / Zona</label><select id="filterSector" disabled><option value="ALL">Todos</option></select></div>
+          <div><label>Mes</label><select id="filterMes"><option value="ALL">Todos</option></select></div>
+          <div class="toolbar" style="margin-top:10px"><button id="btnReset">Limpiar filtros</button></div>
+        </div>
+
+        <!-- KPIs -->
+        <div style="margin-top:18px;border-top:1px solid #e5e7eb;padding-top:14px;display:grid;gap:12px">
+          <div class="kpi-box">
+            <span class="kpi-label">Valor proyectado</span>
+            <input type="number" id="inputValorProy" value="840000000" min="0" step="1000000" style="width:120px;text-align:right;font-weight:700;color:#0f172a;border:1px solid #e5e7eb;border-radius:6px;padding:4px 6px;">
+          </div>
+          <div class="kpi-box kpi-green"><span class="kpi-label">Total actual</span><span id="kpiTotalActual" class="kpi-value">$ 0</span></div>
+          <div class="kpi-box kpi-gray"><span class="kpi-label">Faltante</span><span id="kpiFaltante" class="kpi-value">$ 0</span></div>
+          <div class="kpi-box"><span class="kpi-label">Promedio por mes</span><span id="kpiPromMes2" class="kpi-value">$ 0</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <section id="panelGlobal">
+        <div class="row-main">
+          <div class="table-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <h3 style="margin:0;color:#0f172a">Tabla resumen</h3><small style="color:#6b7280"><span id="rowsCount">0</span> registros</small>
+            </div>
+            <div class="table-scroll">
+              <table id="tablaResumen">
+                <thead><tr><th>Región</th><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
 
-          <!-- Filtros -->
-          <div class="filters">
-            <div>
-              <label>Región</label>
-              <select id="filterRegion"><option value="ALL">Todos</option></select>
-            </div>
-            <div>
-              <label>Sector / Zona</label>
-              <select id="filterSector" disabled><option value="ALL">Todos</option></select>
-            </div>
-            <div>
-              <label>Mes</label>
-              <select id="filterMes"><option value="ALL">Todos</option></select>
-            </div>
-            <div class="toolbar" style="margin-top:8px">
-              <button id="btnReset">Limpiar filtros</button>
-            </div>
-          </div>
-
-          <!-- KPIs -->
-          <div style="margin-top:18px;border-top:1px solid #e5e7eb;padding-top:14px">
-            <small style="color:#6b7280;font-weight:600">Indicadores de Ahorro</small>
-            <div style="margin-top:10px;display:grid;gap:10px;font-size:14px">
-              <div><strong>Valor proyectado:</strong> <span id="kpiValorProy">$ 0</span></div>
-              <div><strong>Total actual:</strong> <span id="kpiTotalActual">$ 0</span></div>
-              <div><strong>Faltante:</strong> <span id="kpiFaltante">$ 0</span></div>
-              <div><strong>Promedio por mes:</strong> <span id="kpiPromMes2">0</span></div>
-            </div>
+          <div class="chart-bar-wrap">
+            <h3 style="margin:6px;color:#0f172a;font-size:15px;font-weight:600">Ahorro por sector</h3>
+            <canvas id="chartBarras"></canvas>
           </div>
         </div>
-      </aside>
+      </section>
+    </main>
+  </div>
+</section>
 
-      <main>
-        <section id="panelGlobal">
-          <div class="row-main">
-            <div class="table-wrap">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-                <h3 style="margin:0">Tabla resumen</h3><small style="color:#6b7280"><span id="rowsCount">0</span> filas</small>
-              </div>
-              <div class="table-scroll">
-                <table id="tablaResumen">
-                  <thead><tr><th>Región</th><th>Sector</th><th>Mes</th><th>Cant</th><th>Ahorro</th></tr></thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
+<!-- ====== HOJA 2: COBRO REVISION ====== -->
+<section id="page2" class="page">
+  <div class="layout" style="grid-template-columns:1fr">
+    <div class="card" style="text-align:center;background:#fff5ec;border-left:5px solid var(--accent);font-weight:700;">INFORMACIÓN PROYECTO REIMAGINAR_CE — COBRO DE REVISIÓN EN CAMBIOS DE MEDIDOR</div>
+    <div class="row-main" style="margin-top:10px;flex-direction:column;gap:20px;">
+      <div class="row-main" style="gap:18px">
+        <div class="card" style="flex:1">
+          <h4 style="margin:4px 0 8px 0;color:#0f172a">KPIs Principales</h4>
+          <div class="kpi-box"><span class="kpi-label">Valor proyectado</span><span id="revKpiProy" class="kpi-value">$ 0</span></div>
+          <div class="kpi-box kpi-green"><span class="kpi-label">Total actual</span><span id="revKpiActual" class="kpi-value">$ 0</span></div>
+          <div class="kpi-box kpi-gray"><span class="kpi-label">Faltante</span><span id="revKpiFaltante" class="kpi-value">$ 0</span></div>
+          <div class="kpi-box"><span class="kpi-label">Promedio por mes</span><span id="revKpiPromMes" class="kpi-value">$ 0</span></div>
+        </div>
+        <div class="chart-bar-wrap" style="flex:1">
+          <h4 style="margin:4px 0 10px 0;color:#0f172a">Porcentaje de Avance por Departamento</h4>
+          <canvas id="revBarPct"></canvas>
+        </div>
+      </div>
 
-            <div class="chart-bar-wrap">
-              <h3 style="margin:6px 6px 10px 6px;color:#0f172a;font-size:15px">Ahorro por sector</h3>
-              <canvas id="chartBarras"></canvas>
-            </div>
-          </div>
-        </section>
-      </main>
+      <div class="table-wrap">
+        <h4 style="margin:0 0 8px 0;color:#0f172a">Resumen mensual</h4>
+        <div class="table-scroll">
+          <table id="revTabla">
+            <thead><tr><th>DEPARTAMENTO</th><th>Febrero</th><th>Marzo</th><th>Abril</th><th>Mayo</th><th>Junio</th><th>Julio</th></tr></thead>
+            <tbody></tbody><tfoot></tfoot>
+          </table>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer>Creado para Celsia · Datos insertados · AHORRO</footer>
+<footer>© 2025 · Celsia · Tablero Reimaginar_CE · Visión Gerencial ⚡</footer>
 
 <script>
-/* ========= DATOS BASE ========= */
-const datos = [
-  { REGION:'VALLE',  SECTOR:'CENTRO',       MES:'abril', CANT:200, AHORRO:15000000 },
-  { REGION:'VALLE',  SECTOR:'NORTE',        MES:'abril', CANT:300, AHORRO:18000000 },
-  { REGION:'VALLE',  SECTOR:'PACIFICO',     MES:'mayo',  CANT:400, AHORRO:25000000 },
-  { REGION:'VALLE',  SECTOR:'SUR',          MES:'junio', CANT:350, AHORRO:18000000 },
-  { REGION:'TOLIMA', SECTOR:'Zona Centro',  MES:'abril', CANT:150, AHORRO: 8000000 },
-  { REGION:'TOLIMA', SECTOR:'Zona Norte',   MES:'mayo',  CANT:200, AHORRO:11000000 },
-  { REGION:'TOLIMA', SECTOR:'Zona Sur',     MES:'junio', CANT:130, AHORRO:13000000 },
-  { REGION:'TOLIMA', SECTOR:'Zona Oriente', MES:'julio', CANT:180, AHORRO: 6000000 },
+const datos=[
+  {REGION:'VALLE',SECTOR:'CENTRO',MES:'abril',CANT:200,AHORRO:15000000},
+  {REGION:'VALLE',SECTOR:'NORTE',MES:'abril',CANT:300,AHORRO:18000000},
+  {REGION:'VALLE',SECTOR:'PACIFICO',MES:'mayo',CANT:400,AHORRO:25000000},
+  {REGION:'VALLE',SECTOR:'SUR',MES:'junio',CANT:350,AHORRO:18000000},
+  {REGION:'TOLIMA',SECTOR:'Zona Centro',MES:'abril',CANT:150,AHORRO:8000000},
+  {REGION:'TOLIMA',SECTOR:'Zona Norte',MES:'mayo',CANT:200,AHORRO:11000000},
+  {REGION:'TOLIMA',SECTOR:'Zona Sur',MES:'junio',CANT:130,AHORRO:13000000},
+  {REGION:'TOLIMA',SECTOR:'Zona Oriente',MES:'julio',CANT:180,AHORRO:6000000},
 ];
+const MESES_ORD=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const fmtMoney=n=>'$ '+Number(n||0).toLocaleString('es-CO');
+const uniq=(arr,key)=>[...new Set(arr.map(x=>x[key]).filter(Boolean))];
+const cap=s=>(s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
+let charts={};
 
-/* ========= HELPERS ========= */
-const MESES_ORD = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-const fmtMoney = n => '$ '+Number(n||0).toLocaleString('es-CO');
-const uniq = (arr,key) => [...new Set(arr.map(x=>x[key]).filter(Boolean))];
-const cap = s => (s||'').charAt(0).toUpperCase()+String(s).slice(1).toLowerCase();
-
-/* ========= PESTAÑAS ========= */
 document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='page1'){render();} else {renderRevision();}
   });
 });
 
-/* ========= HOJA 1 ========= */
-let charts = {};
-function sectoresPorRegion(region){
-  return region==='VALLE'
-    ? ['CENTRO','NORTE','PACIFICO','SUR']
-    : ['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
-}
+function sectoresPorRegion(r){return r==='VALLE'?['CENTRO','NORTE','PACIFICO','SUR']:['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];}
 function poblarFiltrosIniciales(){
-  const regSel = document.getElementById('filterRegion');
-  uniq(datos,'REGION').forEach(r=>{ const o=document.createElement('option'); o.value=r; o.textContent=r; regSel.appendChild(o); });
-  actualizarMeses('ALL'); actualizarSectores('ALL');
+  const regSel=document.getElementById('filterRegion');
+  uniq(datos,'REGION').forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;regSel.appendChild(o);});
+  actualizarMeses('ALL');actualizarSectores('ALL');
 }
 function actualizarSectores(region){
   const sel=document.getElementById('filterSector');
-  const disabled=(region==='ALL'); sel.disabled=disabled;
+  const disabled=(region==='ALL');sel.disabled=disabled;
   let ops=[];
-  if(region==='VALLE') ops=['CENTRO','NORTE','PACIFICO','SUR'];
-  if(region==='TOLIMA') ops=['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
-  if(disabled){ sel.innerHTML='<option value="ALL">Todos</option>'; sel.value='ALL'; }
-  else{ sel.innerHTML='<option value="ALL">Todos</option>'+ops.map(s=>`<option>${s}</option>`).join(''); sel.value='ALL'; }
+  if(region==='VALLE')ops=['CENTRO','NORTE','PACIFICO','SUR'];
+  if(region==='TOLIMA')ops=['Zona Centro','Zona Norte','Zona Sur','Zona Oriente'];
+  sel.innerHTML='<option value="ALL">Todos</option>'+ops.map(s=>`<option>${s}</option>`).join('');
+  sel.value='ALL';
 }
 function actualizarMeses(region){
   const mesSel=document.getElementById('filterMes');
-  let fuente=datos; if(region!=='ALL') fuente=datos.filter(d=>d.REGION===region);
+  let fuente=datos;if(region!=='ALL')fuente=datos.filter(d=>d.REGION===region);
   const meses=uniq(fuente,'MES').sort((a,b)=>MESES_ORD.indexOf(a)-MESES_ORD.indexOf(b));
   mesSel.innerHTML='<option value="ALL">Todos</option>'+meses.map(m=>`<option value="${m}">${cap(m)}</option>`).join('');
-  mesSel.value='ALL';
 }
 function filtrarBase(region){
   const sector=document.getElementById('filterSector').value;
   const mes=document.getElementById('filterMes').value;
   return datos.filter(d=>{
-    if(region!=='ALL'&&d.REGION!==region) return false;
-    if(sector!=='ALL'&&d.SECTOR!==sector) return false;
-    if(mes!=='ALL'&&d.MES!==mes) return false;
+    if(region!=='ALL'&&d.REGION!==region)return false;
+    if(sector!=='ALL'&&d.SECTOR!==sector)return false;
+    if(mes!=='ALL'&&d.MES!==mes)return false;
     return true;
   });
 }
@@ -208,66 +226,91 @@ function render(){
   renderKPIsAhorro();
 }
 function renderTabla(tbodySel,countSel,list,omitRegion,regionName){
-  const mesSel=document.getElementById('filterMes').value;
-  const sectorSel=document.getElementById('filterSector').value;
   const tbody=document.querySelector(tbodySel);
+  const sectores=regionName==='VALLE'?sectoresPorRegion('VALLE'):sectoresPorRegion('TOLIMA');
   let filas=[];
-  if(sectorSel==='ALL'){
-    const sectores=regionName==='VALLE'?sectoresPorRegion('VALLE'):sectoresPorRegion('TOLIMA');
-    sectores.forEach(sec=>{
-      const rows=list.filter(x=>x.SECTOR===sec);
-      const reg=rows[0]?.REGION||regionName;
-      const sC=rows.reduce((a,b)=>a+(b.CANT||0),0);
-      const sA=rows.reduce((a,b)=>a+(b.AHORRO||0),0);
-      filas.push({REGION:reg,SECTOR:sec,MES:'Todos',CANT:sC,AHORRO:sA});
-    });
-  }
+  sectores.forEach(sec=>{
+    const rows=list.filter(x=>x.SECTOR===sec);
+    const reg=rows[0]?.REGION||regionName;
+    const sC=rows.reduce((a,b)=>a+(b.CANT||0),0);
+    const sA=rows.reduce((a,b)=>a+(b.AHORRO||0),0);
+    filas.push({REGION:reg,SECTOR:sec,MES:'Todos',CANT:sC,AHORRO:sA});
+  });
   tbody.innerHTML=filas.map(r=>`
-    <tr>
-      ${omitRegion?'':`<td>${r.REGION}</td>`}
-      <td>${r.SECTOR}</td>
-      <td>${cap(r.MES)}</td>
-      <td>${r.CANT}</td>
-      <td>${fmtMoney(r.AHORRO)}</td>
-    </tr>`).join('');
+  <tr><td>${r.REGION}</td><td>${r.SECTOR}</td><td>${cap(r.MES)}</td>
+  <td>${r.CANT}</td><td>${fmtMoney(r.AHORRO)}</td></tr>`).join('');
   document.querySelector(countSel).textContent=filas.length;
 }
 function renderBars(id,list,region){
   if(charts[id]){charts[id].destroy();}
   const sectRef=region?sectoresPorRegion(region):uniq(list,'SECTOR');
-  const byS={}; sectRef.forEach(s=>byS[s]=0);
+  const byS={};sectRef.forEach(s=>byS[s]=0);
   list.forEach(r=>{byS[r.SECTOR]=(byS[r.SECTOR]||0)+(r.AHORRO||0);});
-  const labels=Object.keys(byS); const values=labels.map(l=>byS[l]);
+  const labels=Object.keys(byS);const values=labels.map(l=>byS[l]);
   charts[id]=new Chart(document.getElementById(id),{
     type:'bar',
-    data:{labels,datasets:[{data:values,backgroundColor:'rgba(242,140,0,0.90)',borderColor:'rgba(242,140,0,1)',borderWidth:1,borderRadius:6}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}},
-    scales:{y:{beginAtZero:true,ticks:{callback:v=>fmtMoney(v)}}}}
+    data:{labels,datasets:[{data:values,backgroundColor:'rgba(242,140,0,0.85)',borderColor:'rgba(242,140,0,1)',borderWidth:1.2,borderRadius:10,barThickness:32}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:900,easing:'easeOutQuart'},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtMoney(c.raw)}}},
+      scales:{y:{beginAtZero:true,grid:{color:'rgba(148,163,184,.15)'},ticks:{callback:v=>fmtMoney(v)}}}}
   });
 }
-
-/* === KPIs Ahorro === */
 function renderKPIsAhorro(){
   const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
-  const proy=840000000;
+  const proy=Number(document.getElementById('inputValorProy').value)||0;
   const falt=Math.max(proy-total,0);
   const meses=uniq(datos,'MES').length||1;
   const promMes=Math.round(total/meses);
-  document.getElementById('kpiValorProy').textContent=fmtMoney(proy);
+  document.getElementById('acumuladoTotal').textContent=fmtMoney(total)+' · Acumulado';
   document.getElementById('kpiTotalActual').textContent=fmtMoney(total);
   document.getElementById('kpiFaltante').textContent=fmtMoney(falt);
   document.getElementById('kpiPromMes2').textContent=fmtMoney(promMes);
 }
+document.getElementById('inputValorProy').addEventListener('input',renderKPIsAhorro);
 
-/* === INIT === */
+function renderRevision(){
+  const total=datos.reduce((a,b)=>a+(b.AHORRO||0),0);
+  const valle=datos.filter(d=>d.REGION==='VALLE').reduce((a,b)=>a+(b.AHORRO||0),0);
+  const tolima=datos.filter(d=>d.REGION==='TOLIMA').reduce((a,b)=>a+(b.AHORRO||0),0);
+  const metaTotal=840000000, metaValle=340000000, metaTolima=500000000;
+  const falt=Math.max(metaTotal-total,0);
+  const meses=uniq(datos,'MES').length||1;
+  const promMes=Math.round(total/meses);
+  document.getElementById('revKpiProy').textContent=fmtMoney(metaTotal);
+  document.getElementById('revKpiActual').textContent=fmtMoney(total);
+  document.getElementById('revKpiFaltante').textContent=fmtMoney(falt);
+  document.getElementById('revKpiPromMes').textContent=fmtMoney(promMes);
+
+  if(charts['revBarPct']){charts['revBarPct'].destroy();}
+  charts['revBarPct']=new Chart(document.getElementById('revBarPct'),{
+    type:'bar',
+    data:{labels:['TOLIMA','VALLE'],datasets:[{data:[(tolima/metaTolima*100),(valle/metaValle*100)],backgroundColor:['#0ea5a5','#22c55e'],borderRadius:10,barThickness:30}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+' %'}}},
+      scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+' %'},grid:{color:'rgba(203,213,225,.4)'}},y:{grid:{display:false}}}}
+  });
+
+  const mesesRef=['febrero','marzo','abril','mayo','junio','julio'];
+  const mat={VALLE:{},TOLIMA:{}};
+  mesesRef.forEach(m=>{mat.VALLE[m]=0;mat.TOLIMA[m]=0;});
+  datos.forEach(d=>{const m=d.MES.toLowerCase();if(mesesRef.includes(m)){mat[d.REGION][m]=(mat[d.REGION][m]||0)+(d.AHORRO||0);}});
+  const tb=document.querySelector('#revTabla tbody');const tf=document.querySelector('#revTabla tfoot');
+  const fmt=v=>v?'$ '+Math.round(v/1_000_000)+' mill.':'$ 0 mill.';
+  const rowT=`<tr><td>TOLIMA</td>${mesesRef.map(m=>`<td>${fmt(mat.TOLIMA[m])}</td>`).join('')}</tr>`;
+  const rowV=`<tr><td>VALLE</td>${mesesRef.map(m=>`<td>${fmt(mat.VALLE[m])}</td>`).join('')}</tr>`;
+  tb.innerHTML=rowT+rowV;
+  const totales=mesesRef.map(m=>(mat.TOLIMA[m]||0)+(mat.VALLE[m]||0));
+  tf.innerHTML=`<tr><td><strong>Total</strong></td>${totales.map(v=>`<td><strong>${fmt(v)}</strong></td>`).join('')}</tr>`;
+}
+
 function init(){
-  document.getElementById('lastUpdated').textContent='Última carga: '+(new Date()).toLocaleString();
+  document.getElementById('lastUpdated').textContent='Actualizado: '+(new Date()).toLocaleString();
   poblarFiltrosIniciales();
   document.getElementById('filterRegion').addEventListener('change',e=>{actualizarSectores(e.target.value);actualizarMeses(e.target.value);render();});
   document.getElementById('filterSector').addEventListener('change',render);
   document.getElementById('filterMes').addEventListener('change',render);
   document.getElementById('btnReset').addEventListener('click',()=>{document.getElementById('filterRegion').value='ALL';actualizarSectores('ALL');actualizarMeses('ALL');render();});
-  render();
+  render();renderRevision();
 }
 window.addEventListener('DOMContentLoaded',init);
 </script>
